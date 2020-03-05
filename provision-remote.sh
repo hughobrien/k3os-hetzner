@@ -46,6 +46,7 @@ if [ "$node_idx" -eq 0 ]; then
 k3os:
   k3s_args:
   - server
+  - --cluster-init
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
   - --node-ip=$node_ipv4_private
@@ -56,10 +57,12 @@ else
 	cat << EOF >> "$config_file"
 k3os:
   k3s_args:
-  - agent
+  - server
+  - --bind-address=$node_ipv4_private
+  - --advertise-address=$node_ipv4_private
   - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
-  server_url: $cluster_url
+  - --server=$cluster_url
   token: $cluster_secret
 EOF
 fi
@@ -90,9 +93,3 @@ chmod +x "$script"
 	"$url_iso"
 
 reboot
-#multi master
-#  - --cluster-init
-#  - --server=$cluster_url
-
-# also try via conf
-#  server_url: $cluster_url

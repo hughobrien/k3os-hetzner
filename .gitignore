@@ -5,6 +5,7 @@ tweet-in/
 .terraform
 ssh-*
 token
+hosting
 terraform
 terraform.tfstate.backup
 terraform.tfstate
