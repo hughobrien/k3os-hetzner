@@ -38,7 +38,7 @@ ssh_authorized_keys:
 - $(awk '{print $1,$2}' < /root/.ssh/authorized_keys)
 hostname: $node_name
 run_cmd:
-- ip route add ${network_cidr} via ${network_gw} dev ${network_gw_dev}
+- sh -c "ip route add ${network_cidr} via ${network_gw} dev ${network_gw_dev} || reboot"
 EOF
 
 if [ "$node_idx" -eq 0 ]; then
