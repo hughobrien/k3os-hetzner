@@ -1,0 +1,10 @@
+email-harvester/
+presets/
+spotify-swap-token/
+tweet-in/
+.terraform
+ssh-*
+token
+terraform
+terraform.tfstate.backup
+terraform.tfstate
