@@ -1,17 +1,17 @@
 #!/bin/bash
 set -xeuo pipefail
 
-hostname="$1"
-location="$2"
-datacenter="$3"
-server_type="$4"
-cluster_secret="$5"
-cidr_pod="$6"
-cidr_service="$7"
-cluster_host_ip="$8"
+node_idx="$1"
+node_name="$2"
+node_ipv4_public="$3"
+node_ipv4_private="$4"
+node_cidr_private="$5"
+node_location="$6"
+node_datacenter="$7"
+node_server_type="$8"
 k3os_ver="$9"
-node_idx="${10}"
-node_ipv4_public="${11}"
+cluster_master="${10}"
+cluster_secret="${11}"
 
 if [ "${hosting:-""}" ]; then
 	url_install="${hosting}/${k3os_ver}/install.sh"
@@ -25,18 +25,18 @@ disk="/dev/sda"
 config_file=$(mktemp)
 script="$(mktemp)"
 
-network_base=$(echo "$cluster_host_ip" | cut -d '.' -f 1-3)
-network_cidr="${network_base}.0/24"
+# NB: this basically all presumes a /24
+network_base=$(echo "$node_ipv4_private" | cut -d '.' -f 1-3)
+network_cidr="${network_base}.0/${node_cidr_private}"
 network_gw="${network_base}.1"
 network_gw_dev="eth1"
-network_address="${network_base}.$((node_idx + 2))"
 
-cluster_url="https://${cluster_host_ip}:6443"
+cluster_url="https://${cluster_master}:6443"
 
 cat << EOF > "$config_file"
 ssh_authorized_keys:
 - $(awk '{print $1,$2}' < /root/.ssh/authorized_keys)
-hostname: $hostname
+hostname: $node_name
 run_cmd:
 - ip route add ${network_cidr} via ${network_gw} dev ${network_gw_dev}
 EOF
@@ -46,10 +46,9 @@ if [ "$node_idx" -eq 0 ]; then
 k3os:
   k3s_args:
   - server
-  - --advertise-address=$network_address
-  - --cluster-cidr=$cidr_pod
-  - --service-cidr=$cidr_service
-  - --node-ip=$network_address
+  - --bind-address=$node_ipv4_private
+  - --advertise-address=$node_ipv4_private
+  - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
   token: $cluster_secret
 EOF
@@ -58,7 +57,7 @@ else
 k3os:
   k3s_args:
   - agent
-  - --node-ip=$network_address
+  - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
   server_url: $cluster_url
   token: $cluster_secret
@@ -67,9 +66,9 @@ fi
 
 cat << EOF >> "$config_file"
   labels:
-    datacenter: $datacenter
-    location: $location
-    server_type: $server_type
+    datacenter: $node_datacenter
+    location: $node_location
+    server_type: $node_server_type
   ntp_servers:
   - 0.de.pool.ntp.org
   - 1.de.pool.ntp.org
@@ -103,3 +102,4 @@ reboot
 
 # also try via conf
 #  server_url: $cluster_url
+# consider externalip == private ip

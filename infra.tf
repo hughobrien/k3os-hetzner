@@ -9,7 +9,7 @@ locals {
 
 resource "random_pet" "servers" {
   for_each = toset(local.hosts_numbered)
-  length   = 1
+  length   = 2
   keepers = {
     k3os_ver = var.default_k3os_ver
   }
@@ -42,18 +42,17 @@ resource "hcloud_server" "hosts" {
   provisioner "local-exec" {
     command = <<-EOT
     bash provision-local.sh \
-		${self.ipv4_address} \
+		${each.value["idx"]} \
 		${self.name} \
+		${self.ipv4_address} \
+		${cidrhost(var.network["host"], each.value["idx"] + var.default_cidr_offset)} \
+		${split("/", var.network["host"])[1]} \
 		${self.location} \
 		${self.datacenter} \
 		${self.server_type} \
-		'${random_password.cluster_secret.result}' \
-		${var.network["pod"]} \
-		${var.network["service"]} \
-		${cidrhost(var.network["host"], var.default_cidr_offset)} \
 		${var.default_k3os_ver} \
-		${each.value["idx"]} \
-		${self.ipv4_address}
+		${cidrhost(var.network["host"], var.default_cidr_offset)} \
+		'${random_password.cluster_secret.result}'
 		EOT
   }
 }
@@ -117,6 +116,6 @@ provider "random" {
 output "conn_str" {
   value = {
     for host in local.hosts_named :
-    host.name => "ssh -i ssh-terraform -o StrictHostKeyChecking=no rancher@${hcloud_server.hosts[host.name].ipv4_address}"
+    "${host.idx} ${host.name}" => "ssh -i ssh-terraform -o StrictHostKeyChecking=no rancher@${hcloud_server.hosts[host.name].ipv4_address}"
   }
 }
