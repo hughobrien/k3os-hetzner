@@ -11,12 +11,12 @@ for f in *.sh; do shellcheck "$f" && shfmt -s -sr -d "$f"; done
 export HCLOUD_TOKEN
 
 destroy=${destroy:-""}
-[ "$destroy" ] && ./terraform destroy
+[ "$destroy" ] && ./terraform destroy -auto-approve
 
 ./terraform apply \
 	-target random_pet.servers \
 	-target random_pet.networks \
 	-auto-approve
-./terraform apply
+./terraform apply -auto-approve
 
 ./terraform state list

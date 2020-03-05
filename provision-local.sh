@@ -17,11 +17,12 @@ node_idx="${11}"
 node_ipv4_public="${12}"
 
 rescue_user=root
-k3os_user=rancher
 key=ssh-terraform
 script_name=provision-remote.sh
 script_dest="/tmp/${script_name}"
-ssh_opts="-oStrictHostKeyChecking=no"
+ssh_opts="-o StrictHostKeyChecking=no"
+
+[ -z "${hosting:-""}" ] && echo hosting not set, falling back on github
 
 # remove existing ssh keys
 ssh-keygen -R "$host"
@@ -33,7 +34,8 @@ while [ "$response" != "rescue" ]; do
 done
 
 scp "$ssh_opts" -i "$key" "$script_name" "${rescue_user}@${host}:${script_dest}"
-ssh "$ssh_opts" -o SendEnv=hosting ${hosting=""} -i "$key" "${rescue_user}@${host}" \
+ssh "$ssh_opts" -i "$key" "${rescue_user}@${host}" \
+	hosting="${hosting:-""}" \
 	"$script_dest" \
 	"$name" \
 	"$location" \
@@ -49,14 +51,3 @@ ssh "$ssh_opts" -o SendEnv=hosting ${hosting=""} -i "$key" "${rescue_user}@${hos
 
 # remove rescue ssh key
 ssh-keygen -R "$host"
-response=""
-while [ -z "$response" ]; do
-	response=$(ssh-keyscan -t ed25519 "$host" 2>&1 | grep ssh-ed25519)
-	sleep 5
-done
-
-# add new ssh key to known_hosts
-echo "$response" >> ~/.ssh/known_hosts
-
-# final reboot seems necessary to prevent race condition with network setup
-ssh -i "$key" "${k3os_user}@${host}" sudo reboot

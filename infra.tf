@@ -117,6 +117,6 @@ provider "random" {
 output "conn_str" {
   value = {
     for host in local.hosts_named :
-    host.name => "ssh -i ssh-terraform rancher@${hcloud_server.hosts[host.name].ipv4_address}"
+    host.name => "ssh -i ssh-terraform -o StrictHostKeyChecking=no rancher@${hcloud_server.hosts[host.name].ipv4_address}"
   }
 }
