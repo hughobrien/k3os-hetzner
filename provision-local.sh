@@ -33,7 +33,7 @@ while [ "$response" != "rescue" ]; do
 done
 
 scp "$ssh_opts" -i "$key" "$script_name" "${rescue_user}@${host}:${script_dest}"
-ssh "$ssh_opts" -i "$key" "${rescue_user}@${host}" \
+ssh "$ssh_opts" -o SendEnv=hosting ${hosting=""} -i "$key" "${rescue_user}@${host}" \
 	"$script_dest" \
 	"$name" \
 	"$location" \
