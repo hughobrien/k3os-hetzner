@@ -90,16 +90,9 @@ chmod +x "$script"
 	"$url_iso"
 
 reboot
-# data_sources:
-#  - hetzner
-
-# odd ws errors
-#  - --bind-address=$network_address
-
 #multi master
 #  - --cluster-init
 #  - --server=$cluster_url
 
 # also try via conf
 #  server_url: $cluster_url
-# consider externalip == private ip
