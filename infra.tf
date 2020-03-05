@@ -1,5 +1,6 @@
 # have HCLOUD_TOKEN exported
 # have your ssh key in your agent
+# have hosting envvar set if you don't want to pull from github
 # TODO add LB to different networks for blue/green (up to 3)
 
 locals {
