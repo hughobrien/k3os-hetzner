@@ -13,16 +13,20 @@ k3os_ver="$9"
 node_idx="${10}"
 node_ipv4_public="${11}"
 
-b2_bucket="https://f002.backblazeb2.com/file/radiant-public/${k3os_ver}"
-urlinstall="${b2_bucket}/install.sh"
-urliso="${b2_bucket}/k3os-amd64.iso"
+if [ "${hosting:-""}" ]; then
+	url_install="${hosting}/${k3os_ver}/install.sh"
+	url_iso="${hosting}/${k3os_ver}/k3os-amd64.iso"
+else
+	url_install="https://raw.githubusercontent.com/rancher/k3os/${k3os_ver}/install.sh"
+	url_iso="https://github.com/rancher/k3os/releases/download/${k3os_ver}/k3os-amd64.iso"
+fi
 
 disk="/dev/sda"
 config_file=$(mktemp)
 script="$(mktemp)"
 
 network_base=$(echo "$cluster_host_ip" | cut -d '.' -f 1-3)
-network_cidr="${network_base}.0/16"
+network_cidr="${network_base}.0/24"
 network_gw="${network_base}.1"
 network_gw_dev="eth1"
 network_address="${network_base}.$((node_idx + 2))"
@@ -78,13 +82,13 @@ cat << EOF >> "$config_file"
   - 2a01:4f8:0:a111::add:9898
 EOF
 
-curl -Lo "$script" "$urlinstall"
+curl -Lo "$script" "$url_install"
 chmod +x "$script"
 
 "$script" \
 	--config "$config_file" \
 	"$disk" \
-	"$urliso"
+	"$url_iso"
 
 reboot
 # data_sources:

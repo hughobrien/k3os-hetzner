@@ -28,7 +28,7 @@ resource "hcloud_network_subnet" "subnet" {
   network_id   = hcloud_network.vpc.id
   type         = "server" # required?
   network_zone = var.network["zone"]
-  ip_range     = var.network["vpc"]
+  ip_range     = var.network["host"]
 }
 
 resource "hcloud_server" "hosts" {
@@ -50,7 +50,7 @@ resource "hcloud_server" "hosts" {
 		'${random_password.cluster_secret.result}' \
 		${var.network["pod"]} \
 		${var.network["service"]} \
-		${cidrhost(var.network["vpc"], var.default_cidr_offset)} \
+		${cidrhost(var.network["host"], var.default_cidr_offset)} \
 		${var.default_k3os_ver} \
 		${each.value["idx"]} \
 		${self.ipv4_address}
@@ -62,7 +62,7 @@ resource "hcloud_server_network" "network_bindings" {
   for_each   = local.hosts_named
   server_id  = hcloud_server.hosts[each.key].id
   network_id = hcloud_network.vpc.id
-  ip         = cidrhost(var.network["vpc"], each.value["idx"] + var.default_cidr_offset)
+  ip         = cidrhost(var.network["host"], each.value["idx"] + var.default_cidr_offset)
 }
 
 #resource "hcloud_floating_ip" "ingress-nbg-0" {
@@ -98,13 +98,13 @@ resource "random_password" "cluster_secret" {
 #  automount = true
 #}
 
-data "hcloud_location" "primary" {
-  name = "nbg1"
-}
-
-data "hcloud_location" "secondary" {
-  name = "fsn1"
-}
+#data "hcloud_location" "primary" {
+#  name = "nbg1"
+#}
+#
+#data "hcloud_location" "secondary" {
+#  name = "fsn1"
+#}
 
 provider "hcloud" {
   version = "~> 1.15"
