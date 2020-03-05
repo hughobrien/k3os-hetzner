@@ -22,7 +22,7 @@ config_file=$(mktemp)
 script="$(mktemp)"
 
 network_base=$(echo "$cluster_host_ip" | cut -d '.' -f 1-3)
-network_cidr="${network_base}.0/24"
+network_cidr="${network_base}.0/16"
 network_gw="${network_base}.1"
 network_gw_dev="eth1"
 network_address="${network_base}.$((node_idx + 2))"
@@ -45,7 +45,6 @@ k3os:
   - --advertise-address=$network_address
   - --cluster-cidr=$cidr_pod
   - --service-cidr=$cidr_service
-  - --with-node-id
   - --node-ip=$network_address
   - --node-external-ip=$node_ipv4_public
   token: $cluster_secret
@@ -55,7 +54,6 @@ else
 k3os:
   k3s_args:
   - agent
-  - --with-node-id
   - --node-ip=$network_address
   - --node-external-ip=$node_ipv4_public
   server_url: $cluster_url

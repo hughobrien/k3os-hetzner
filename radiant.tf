@@ -19,17 +19,16 @@ resource "random_pet" "networks" {
   length = 1
 }
 
-resource "hcloud_network" "k3" {
+resource "hcloud_network" "vpc" {
   name     = random_pet.networks.id
   ip_range = var.network["vpc"]
 }
 
-resource "hcloud_network_subnet" "subnets" {
-  for_each     = toset(["host", "pod", "service"])
-  network_id   = hcloud_network.k3.id
+resource "hcloud_network_subnet" "subnet" {
+  network_id   = hcloud_network.vpc.id
   type         = "server" # required?
   network_zone = var.network["zone"]
-  ip_range     = var.network["${each.value}"]
+  ip_range     = var.network["vpc"]
 }
 
 resource "hcloud_server" "hosts" {
@@ -51,7 +50,7 @@ resource "hcloud_server" "hosts" {
 		'${random_password.cluster_secret.result}' \
 		${var.network["pod"]} \
 		${var.network["service"]} \
-		${cidrhost(var.network["host"], var.default_cidr_offset)} \
+		${cidrhost(var.network["vpc"], var.default_cidr_offset)} \
 		${var.default_k3os_ver} \
 		${each.value["idx"]} \
 		${self.ipv4_address}
@@ -62,8 +61,8 @@ resource "hcloud_server" "hosts" {
 resource "hcloud_server_network" "network_bindings" {
   for_each   = local.hosts_named
   server_id  = hcloud_server.hosts[each.key].id
-  network_id = hcloud_network.k3.id
-  ip         = cidrhost(var.network["host"], each.value["idx"] + var.default_cidr_offset)
+  network_id = hcloud_network.vpc.id
+  ip         = cidrhost(var.network["vpc"], each.value["idx"] + var.default_cidr_offset)
 }
 
 #resource "hcloud_floating_ip" "ingress-nbg-0" {
