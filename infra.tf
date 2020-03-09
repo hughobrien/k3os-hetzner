@@ -78,7 +78,7 @@ resource "hcloud_server_network" "network_bindings" {
 
 resource "hcloud_ssh_key" "ssh-terraform" {
   name       = "Terraform SSH key"
-  public_key = file("ssh-terraform.pub")
+  public_key = file("secrets/ssh-terraform.pub")
 }
 
 resource "random_password" "cluster_secret" {
@@ -117,6 +117,6 @@ provider "random" {
 output "conn_str" {
   value = {
     for host in local.hosts_named :
-    "${host.idx} ${host.name}" => "ssh -i ssh-terraform -o StrictHostKeyChecking=no rancher@${hcloud_server.hosts[host.name].ipv4_address}"
+    "${host.idx} ${host.name}" => "ssh -i secrets/ssh-terraform -o StrictHostKeyChecking=no rancher@${hcloud_server.hosts[host.name].ipv4_address}"
   }
 }

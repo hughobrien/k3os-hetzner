@@ -1,11 +1,6 @@
-email-harvester/
-presets/
-spotify-swap-token/
-tweet-in/
+secrets/
+src/
 .terraform
-ssh-*
-token
-hosting
 terraform
 terraform.tfstate.backup
 terraform.tfstate

@@ -14,7 +14,7 @@ cluster_master="${10}"
 cluster_secret="${11}"
 
 rescue_user=root
-ssh_key=ssh-terraform
+ssh_key=secrets/ssh-terraform
 script_name=provision-remote.sh
 script_dest="/tmp/${script_name}"
 ssh_opts="-o StrictHostKeyChecking=no"
