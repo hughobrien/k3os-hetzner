@@ -20,5 +20,5 @@ for f in \
 	secrets/b2.yaml \
 	manifests/minio.yaml \
 	manifests/dockerreg.yaml; do
-	cat "$f" | $kaf
+	$kaf < "$f"
 done
