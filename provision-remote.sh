@@ -39,6 +39,13 @@ ssh_authorized_keys:
 hostname: $node_name
 run_cmd:
 - sh -c "ip route add ${network_cidr} via ${network_gw} dev ${network_gw_dev} || reboot"
+wrte_files:
+- path: /home/rancher/.bash_profile
+  content: |
+    alias k=kubectl
+  owner: rancher
+  permissions: '0644'
+  encoding: ""
 EOF
 
 if [ "$node_idx" -eq 0 ]; then

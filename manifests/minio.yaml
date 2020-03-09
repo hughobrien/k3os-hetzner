@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      securityContext:
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: minio
+          image: minio/minio:RELEASE.2020-03-06T22-23-56Z
+          imagePullPolicy: Always
+          command:
+            - /usr/bin/minio
+            - gateway
+            - b2
+            - -config-dir=/empty/config
+            - -certs-dir=/empty/certs
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 0.10
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          ports:
+            - name: minio
+              containerPort: 9000
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: b2
+                  key: key_id
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: b2
+                  key: application_key
+          readinessProbe:
+            httpGet:
+              port: minio
+              path: /minio/health/ready
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              port: minio
+              path: /minio/health/live
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: empty
+              mountPath: /empty
+              readOnly: false
+      volumes:
+        - name: empty
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  ports:
+    - port: 80
+      name: minio
+      targetPort: minio
+  selector:
+    app: minio

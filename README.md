@@ -7,6 +7,7 @@ nbg1-tops-fawn       Ready    master   84s   v1.17.2+k3s1   10.0.0.3      88.198
 nbg1-liberal-worm    Ready    master   97s   v1.17.2+k3s1   10.0.0.2      116.203.xxx.xxx   k3OS v0.9.1   5.0.0-37-generic   containerd://1.3.3-k3s1
 ```
 
+# Cluster Setup
 1. Get [Terraform](https://www.terraform.io/downloads.html)
 1. Get [ShellCheck](https://www.shellcheck.net/)
 1. Get [shfmt](https://github.com/mvdan/sh)
@@ -21,6 +22,23 @@ nbg1-liberal-worm    Ready    master   97s   v1.17.2+k3s1   10.0.0.2      116.20
 1. Optional: Modify `terraform.tfvars` to put one node in each Hetzner location. Must be an odd number of total nodes.
 1. `./check.sh`
 1. `./build.sh`
-1. Optional: `./provision-post.sh <the IP of ONE of your nodes>`
-	1. Adds [Longhorn](https://github.com/longhorn/longhorn/releases)
 1. Screw up? `destroy=1 ./build.sh`
+
+# Registry Setup
+*You can avoid all of this by using one of the many commercial container registry services*
+That said, [Backblaze](https://www.backblaze.com/b2/cloud-storage.html) is comically cheap, and with a little setup can store our images.
+
+1. Get [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+1. Get a Backblaze account.
+	1. Enable B2
+	1. Create a bucket
+	1. Generate an application key
+	1. Make a K8s secret with the above info:
+		`kubectl create secret generic --dry-run --output yaml b2 --from-literal=key_id='<your key_id>' --from-literal=application_key='<your app key>' > secrets/b2.yaml`
+		Be sure to single quote escape the key to prevent your shell getting notions.
+
+# Provisioning # TODO need for longhorn?
+1. `./provision-post.sh <the IP of ONE of your nodes>`
+	1. Adds your B2 secret
+	1. Adds a [minio](https://hub.docker.com/r/minio/minio) deployment, configured to front [b2 as s3](https://github.com/minio/minio/blob/master/docs/gateway/b2.md)
+	#1. Adds [Longhorn](https://github.com/longhorn/longhorn/releases)
