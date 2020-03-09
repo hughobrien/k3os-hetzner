@@ -1,0 +1,121 @@
+---
+kind: ConfigMap
+metadata:
+  name: dockerreg
+apiVersion: v1
+data:
+  config.yml: |
+    version: 0.1
+    storage:
+      cache:
+        blobdescriptor: inmemory
+      delete:
+        enabled: true
+      s3:
+        region: eu-west-1
+        regionendpoint: minio
+    http:
+      addr: :5000
+      debug:
+        addr: :9090
+        prometheus:
+          enabled: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockerreg
+  labels:
+    app: dockerreg
+spec:
+  selector:
+    matchLabels:
+      app: dockerreg
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: dockerreg
+    spec:
+      securityContext:
+        runAsUser: 1000
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: dockerreg
+          image: registry:2.7
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 0.10
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          ports:
+            - name: dockerreg
+              containerPort: 5000
+            - name: metrics
+              containerPort: 9090
+          env:
+            - name: REGISTRY_STORAGE_S3_ACCESSKEY
+              valueFrom:
+                secretKeyRef:
+                  name: b2
+                  key: key_id
+            - name: REGISTRY_STORAGE_S3_SECRETKEY
+              valueFrom:
+                secretKeyRef:
+                  name: b2
+                  key: application_key
+            - name: REGISTRY_STORAGE_S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: b2
+                  key: bucket
+            - name: REGISTRY_HTTP_SECRET
+              value: foo
+          readinessProbe:
+            httpGet:
+              port: dockerreg
+              path: /
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              port: dockerreg
+              path: /
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: config
+              mountPath: /etc/docker/registry
+              readOnly: true
+            - name: empty
+              mountPath: /empty
+              readOnly: false
+      volumes:
+        - name: config
+          configMap:
+            name: dockerreg
+        - name: empty
+          emptyDir:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dockerreg
+  labels:
+    app: dockerreg
+spec:
+  clusterIP: 10.43.14.192
+  ports:
+    - port: 80
+      name: dockerreg
+      targetPort: dockerreg
+    - port: 9090
+      name: metrics
+      targetPort: metrics
+  selector:
+    app: dockerreg

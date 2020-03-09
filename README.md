@@ -36,7 +36,7 @@ That said, [Backblaze](https://www.backblaze.com/b2/cloud-storage.html) is comic
 	1. Create a bucket
 	1. Generate an application key
 	1. Make a K8s secret with the above info:
-		`kubectl create secret generic --dry-run --output yaml b2 --from-literal=key_id='<your key_id>' --from-literal=application_key='<your app key>' > secrets/b2.yaml`
+		`kubectl create secret generic --dry-run --output yaml b2 --from-literal=key_id='<your key_id>' --from-literal=application_key='<your app key>' --from-literal=bucket='<your b2-bucket>' -n registry > secrets/b2.yaml`
 		Be sure to single quote escape the key to prevent your shell getting notions.
 
 # Provisioning # TODO need for longhorn?
