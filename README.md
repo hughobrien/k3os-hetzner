@@ -21,5 +21,5 @@ nbg1-liberal-worm    Ready    master   97s   v1.17.2+k3s1   10.0.0.2      116.20
 1. Optional: Modify `terraform.tfvars` to put one node in each Hetzner location. Must be an odd number of total nodes.
 1. `./check.sh`
 1. `./build.sh`
-1. Optional: `./provision.sh`
+1. Optional: `./provision-post.sh <the IP of ONE of your nodes>`
 1. Screw up? `destroy=1 ./build.sh`
