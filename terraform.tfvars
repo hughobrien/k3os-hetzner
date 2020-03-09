@@ -7,7 +7,14 @@ network = {
 }
 
 presence = [
-  { "region" : "nuremberg", "code" : "nbg1", "count" : 1 },
-  { "region" : "falkenstein", "code" : "fsn1", "count" : 1 },
-  { "region" : "helsinki", "code" : "hel1", "count" : 1 },
+  { "region" : "nuremberg", "code" : "nbg1", "count" : 3 },
+  { "region" : "falkenstein", "code" : "fsn1", "count" : 0 },
+  { "region" : "helsinki", "code" : "hel1", "count" : 0 },
 ]
+
+# Also Consider
+#presence = [
+#  { "region" : "nuremberg", "code" : "nbg1", "count" : 1 },
+#  { "region" : "falkenstein", "code" : "fsn1", "count" : 1 },
+#  { "region" : "helsinki", "code" : "hel1", "count" : 1 },
+#]
