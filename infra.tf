@@ -1,8 +1,3 @@
-# have HCLOUD_TOKEN exported
-# have your ssh key in your agent
-# have hosting envvar set if you don't want to pull from github
-# TODO add LB to different networks for blue/green (up to 3)
-
 locals {
   hosts_numbered = sort(flatten([for region in var.presence : [for elem in range(region["count"]) : "${region["code"]}-${elem}"]]))
   hosts_named    = { for host in local.hosts_numbered : "${split("-", host)[0]}-${random_pet.servers[host].id}" => { "idx" : index(local.hosts_numbered, host), "location" : "${split("-", host)[0]}", "name" : "${split("-", host)[0]}-${random_pet.servers[host].id}", "id" : host } }
