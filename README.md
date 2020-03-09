@@ -1,4 +1,6 @@
-Supports [multi-master](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/)
+- [k3os](https://github.com/rancher/k3os)
+- Supports [multi-master](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/)
+- Current cost: €9.18 per month
 ```
 nbg1-liberal-worm [~]$ kubectl get nodes -o wide
 NAME                 STATUS   ROLES    AGE   VERSION        INTERNAL-IP   EXTERNAL-IP      OS-IMAGE      KERNEL-VERSION     CONTAINER-RUNTIME

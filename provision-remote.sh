@@ -39,13 +39,6 @@ ssh_authorized_keys:
 hostname: $node_name
 run_cmd:
 - sh -c "ip route add ${network_cidr} via ${network_gw} dev ${network_gw_dev} || reboot"
-wrte_files:
-- path: /home/rancher/.bash_profile
-  content: |
-    alias k=kubectl
-  owner: rancher
-  permissions: '0644'
-  encoding: ""
 EOF
 
 if [ "$node_idx" -eq 0 ]; then
@@ -56,6 +49,7 @@ k3os:
   - --cluster-init
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
+  - --flannel-backend=ipsec
   - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
   token: $cluster_secret
@@ -65,11 +59,12 @@ else
 k3os:
   k3s_args:
   - server
+  - --server=$cluster_url
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
+  - --flannel-backend=ipsec
   - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
-  - --server=$cluster_url
   token: $cluster_secret
 EOF
 fi
