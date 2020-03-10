@@ -13,9 +13,12 @@ data:
         enabled: true
       s3:
         region: eu-west-1
-        regionendpoint: minio
+        regionendpoint: http://minio
+    log:
+      level: debug
     http:
       addr: :5000
+      secret: foo
       debug:
         addr: :9090
         prometheus:
@@ -74,8 +77,6 @@ spec:
                 secretKeyRef:
                   name: b2
                   key: bucket
-            - name: REGISTRY_HTTP_SECRET
-              value: foo
           readinessProbe:
             httpGet:
               port: dockerreg
