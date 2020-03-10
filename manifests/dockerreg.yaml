@@ -12,8 +12,9 @@ data:
       delete:
         enabled: true
       s3:
-        region: eu-west-1
-        regionendpoint: http://minio
+        region: us-east-1
+        regionendpoint: minio
+        secure: false
     log:
       level: debug
     http:
