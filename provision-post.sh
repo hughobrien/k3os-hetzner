@@ -12,10 +12,12 @@ kaf="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl apply -f
 longhorn_ver="v0.8.0-rc2"
 longhorn_controller="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
 
+# shellcheck disable=SC2066
 for url in "$longhorn_controller"; do
 	curl --silent "$url" | $kaf
 done
 
+# shellcheck disable=SC2043
 for f in \
 	manifests/dockerreg-local.yaml; do
 	$kaf < "$f"
