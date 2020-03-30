@@ -15,11 +15,11 @@ cluster_secret="${11}"
 
 if [ "${hosting:-""}" ]; then
 	#url_install="${hosting}/${k3os_ver}/install.sh" # TODO restore
-	url_install="https://raw.githubusercontent.com/hughobrien/k3os/partprobe-sleep/install.sh"
+	url_install="https://raw.githubusercontent.com/rancher/k3os/master/install.sh"
 	url_iso="${hosting}/${k3os_ver}/k3os-amd64.iso"
 else
 	#url_install="https://raw.githubusercontent.com/rancher/k3os/${k3os_ver}/install.sh" # TODO restore
-	url_install="https://raw.githubusercontent.com/hughobrien/k3os/partprobe-sleep/install.sh"
+	url_install="https://raw.githubusercontent.com/rancher/k3os/master/install.sh"
 	url_iso="https://github.com/rancher/k3os/releases/download/${k3os_ver}/k3os-amd64.iso"
 fi
 
