@@ -1,7 +1,8 @@
+.terraform*
+k3os/
+notes
 secrets/
 src/
-.terraform*
 terraform
 terraform.tfstate*
 tmp/
-notes
