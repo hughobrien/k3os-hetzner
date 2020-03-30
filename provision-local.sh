@@ -43,7 +43,7 @@ ssh "$ssh_opts" -i "$ssh_key" "${rescue_user}@${node_ipv4_public}" \
 	"$node_server_type" \
 	"$k3os_ver" \
 	"$cluster_master" \
-	"$cluster_secret"
+	"$cluster_secret" || true
 
 # remove rescue ssh key
 ssh-keygen -R "$node_ipv4_public"
