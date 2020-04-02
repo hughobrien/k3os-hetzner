@@ -18,7 +18,6 @@ for url in "$longhorn_controller"; do
 done
 
 # shellcheck disable=SC2043
-for f in \
-	manifests/dockerreg-local.yaml; do
+for f in manifests/*; do
 	$kaf < "$f"
 done
