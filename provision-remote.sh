@@ -60,6 +60,7 @@ write_files:
   encoding: ""
 EOF
 
+# TODO wireguard
 if [ "$node_idx" -eq 0 ]; then
 	cat << EOF >> "$config_file"
 k3os:
@@ -81,7 +82,7 @@ k3os:
   - --server=$cluster_url
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
-  - --flannel-backend=ipsec
+  - --flannel-backend=vxlan
   - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
   token: $cluster_secret
