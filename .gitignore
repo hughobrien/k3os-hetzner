@@ -1,5 +1,6 @@
 .terraform*
 k3os/
+k3os-kernel/
 notes
 secrets/
 src/
