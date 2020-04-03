@@ -10,6 +10,16 @@ metadata:
   namespace: prometheus
   name: prometheus
 data:
+
+  entrypoint.sh: |
+    #!/bin/sh
+    set -xeu
+    /bin/prometheus \
+    --config.file=/config/prometheus.yml \
+    --storage.tsdb.path=/data \
+    --storage.tsdb.retention.size=1GB \
+    --storage.tsdb.wal-compression
+
   prometheus.yml: |
     global:
       scrape_interval: 10s
@@ -79,9 +89,7 @@ spec:
               memory: 256Mi
               cpu: 0.1
           command:
-            - /bin/prometheus
-            - --config.file=/config/prometheus.yml
-            - --storage.tsdb.path=/data
+            - /config/entrypoint.sh
           securityContext:
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
@@ -119,3 +127,4 @@ spec:
         - name: config
           configMap:
             name: prometheus
+            defaultMode: 0500
