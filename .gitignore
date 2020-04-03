@@ -1,9 +1,8 @@
 .terraform*
-k3os/
 k3os-kernel/
-notes
+k3os/
+scratch/
 secrets/
 src/
 terraform
 terraform.tfstate*
-tmp/
