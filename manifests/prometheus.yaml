@@ -28,6 +28,10 @@ data:
         static_configs:
           - targets:
               - localhost:9090
+      - job_name: traefik
+        static_configs:
+          - targets:
+              - traefik-prometheus.kube-system:9100
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
