@@ -29,20 +29,22 @@ data:
           - targets:
               - localhost:9090
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
 metadata:
   namespace: prometheus
   name: prometheus
-  labels:
-    app: prometheus
+  annotations:
+    kubernetes.io/ingress.class: traefik
 spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: longhorn2
-  resources:
-    requests:
-      storage: 2Gi
+  rules:
+    - host: prometheus.k3s.hughobrien.ie
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: prometheus
+              servicePort: http
 ---
 apiVersion: v1
 kind: Service
@@ -57,7 +59,23 @@ spec:
   type: ClusterIP
   ports:
     - port: 80
+      name: http
       targetPort: http
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: prometheus
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn2
+  resources:
+    requests:
+      storage: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
