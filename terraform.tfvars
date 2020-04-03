@@ -20,8 +20,5 @@ presence = [
 #]
 
 # Choose your server type
-#default_server_type = "cx11"
-default_server_type = "cx21"
-#default_server_type = "cx31"
-#default_server_type = "cx41"
-#default_server_type = "cx51"
+# Choices: cx[11|21|31|41|51]
+default_server_type = "cx11"
