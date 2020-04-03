@@ -11,8 +11,9 @@ nbg1-liberal-worm    Ready    master   97s   v1.17.2+k3s1   10.0.0.2      116.20
 
 # Cluster Setup
 1. Get [Terraform](https://www.terraform.io/downloads.html)
-1. Get [ShellCheck](https://www.shellcheck.net/)
-1. Get [shfmt](https://github.com/mvdan/sh)
+1. Optional: Get [ShellCheck](https://www.shellcheck.net/)
+1. Optional: Get [shfmt](https://github.com/mvdan/sh)
+1. Optional: Get [yamllint](https://pypi.org/project/yamllint/)
 1. Open a [Hetzner account](https://www.hetzner.com/).
 1. Generate a Hetzner token: `https://console.hetzner.cloud/projects/<your project ID>/access/tokens`
 	1. Save it as `secrets/hetzner-token`
@@ -22,7 +23,7 @@ nbg1-liberal-worm    Ready    master   97s   v1.17.2+k3s1   10.0.0.2      116.20
 	1. If you do not specify this, it will pull from GitHub which may be slow, or broken, or compromised.
 	1. The provided link must be publicly accessible.
 1. Optional: Modify `terraform.tfvars` to put one node in each Hetzner location. Must be an odd number of total nodes.
-1. `./check.sh`
+1. Optional: `./check.sh`
 1. `./build.sh`
 1. Screw up? `destroy=1 ./build.sh`
 

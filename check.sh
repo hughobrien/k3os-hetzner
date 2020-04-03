@@ -22,6 +22,10 @@ for f in *.sh; do
 	shfmt -s -sr -d "$f"
 done
 
+for f in manifests/*; do
+	yamllint "$f"
+done
+
 export HCLOUD_TOKEN
 
 terraform validate
