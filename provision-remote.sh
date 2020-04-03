@@ -32,6 +32,7 @@ network_base=$(echo "$node_ipv4_private" | cut -d '.' -f 1-3)
 network_cidr="${network_base}.0/${node_cidr_private}"
 network_gw="${network_base}.1"
 network_gw_dev="eth1"
+flannel_mode="vxlan"
 
 cluster_url="https://${cluster_master}:6443"
 
@@ -61,7 +62,6 @@ write_files:
 EOF
 
 # TODO wireguard
-# NB: --flannel-backend appears twice
 if [ "$node_idx" -eq 0 ]; then
 	cat << EOF >> "$config_file"
 k3os:
@@ -70,7 +70,7 @@ k3os:
   - --cluster-init
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
-  - --flannel-backend=vxlan
+  - --flannel-backend=$flannel_mode
   - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
   token: $cluster_secret
@@ -83,7 +83,7 @@ k3os:
   - --server=$cluster_url
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
-  - --flannel-backend=vxlan
+  - --flannel-backend=$flannel_mode
   - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
   token: $cluster_secret
