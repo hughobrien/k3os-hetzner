@@ -61,6 +61,7 @@ write_files:
 EOF
 
 # TODO wireguard
+# NB: --flannel-backend appears twice
 if [ "$node_idx" -eq 0 ]; then
 	cat << EOF >> "$config_file"
 k3os:
@@ -69,7 +70,7 @@ k3os:
   - --cluster-init
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
-  - --flannel-backend=ipsec
+  - --flannel-backend=vxlan
   - --node-ip=$node_ipv4_private
   - --node-external-ip=$node_ipv4_public
   token: $cluster_secret
