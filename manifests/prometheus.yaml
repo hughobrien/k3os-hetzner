@@ -22,7 +22,7 @@ data:
 
   prometheus.yml: |
     global:
-      scrape_interval: 10s
+      scrape_interval: 20s
     scrape_configs:
       - job_name: prometheus
         static_configs:
@@ -36,25 +36,25 @@ data:
 
       - job_name: kubernetes-apiservers
         kubernetes_sd_configs:
-        - role: endpoints
+          - role: endpoints
         scheme: https
         tls_config:
-          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         relabel_configs:
-        - source_labels:
-          - __meta_kubernetes_namespace
-          - __meta_kubernetes_service_name
-          - __meta_kubernetes_endpoint_port_name
+          - source_labels:
+              - __meta_kubernetes_namespace
+              - __meta_kubernetes_service_name
+              - __meta_kubernetes_endpoint_port_name
           action: keep
           regex: default;kubernetes;https
 
-      - job_name: kubernetes-nodes
+      - job_name: kubernetes-cadvisor
         kubernetes_sd_configs:
-        - role: node
+          - role: node
         scheme: https
         tls_config:
-          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         relabel_configs:
           - action: labelmap
@@ -62,97 +62,28 @@ data:
           - target_label: __address__
             replacement: kubernetes.default.svc:443
           - source_labels:
-            - __meta_kubernetes_node_name
+              - __meta_kubernetes_node_name
             regex: (.+)
             target_label: __metrics_path__
-            replacement: /api/v1/nodes/${1}/proxy/metrics
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
 
-      - job_name: kubernetes-cadvisor
+      - job_name: kubernetes-nodes
         kubernetes_sd_configs:
-        - role: node
+          - role: node
         scheme: https
         tls_config:
-          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         relabel_configs:
-        - action: labelmap
-          regex: __meta_kubernetes_node_label_(.+)
-        - target_label: __address__
-          replacement: kubernetes.default.svc:443
-        - source_labels:
-          - __meta_kubernetes_node_name
-          regex: (.+)
-          target_label: __metrics_path__
-          replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
-
-      - job_name: kubernetes-service-endpoints
-        kubernetes_sd_configs:
-        - role: endpoints
-        relabel_configs:
-        - action: labelmap
-          regex: __meta_kubernetes_service_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
-        - source_labels: [__meta_kubernetes_service_name]
-          action: replace
-          target_label: kubernetes_name
-
-      - job_name: kubernetes-services
-        metrics_path: /probe
-        params:
-          module: [http_2xx]
-        kubernetes_sd_configs:
-        - role: service
-        relabel_configs:
-        - source_labels: [__address__]
-          target_label: __param_target
-        - target_label: __address__
-          replacement: blackbox-exporter.example.com:9115
-        - source_labels: [__param_target]
-          target_label: instance
-        - action: labelmap
-          regex: __meta_kubernetes_service_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          target_label: kubernetes_namespace
-        - source_labels: [__meta_kubernetes_service_name]
-          target_label: kubernetes_name
-
-      - job_name: kubernetes-ingresses
-        metrics_path: /probe
-        params:
-          module: [http_2xx]
-        kubernetes_sd_configs:
-        - role: ingress
-        relabel_configs:
-        - source_labels:
-          - __meta_kubernetes_ingress_scheme,__address__,__meta_kubernetes_ingress_path
-          regex: (.+);(.+);(.+)
-          replacement: ${1}://${2}${3}
-          target_label: __param_target
-        - target_label: __address__
-          replacement: blackbox-exporter.example.com:9115
-        - source_labels: [__param_target]
-          target_label: instance
-        - action: labelmap
-          regex: __meta_kubernetes_ingress_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          target_label: kubernetes_namespace
-        - source_labels: [__meta_kubernetes_ingress_name]
-          target_label: kubernetes_name
-
-      - job_name: kubernetes-pods
-        kubernetes_sd_configs:
-        - role: pod
-        relabel_configs:
-        - action: labelmap
-          regex: __meta_kubernetes_pod_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
-        - source_labels: [__meta_kubernetes_pod_name]
-          action: replace
-          target_label: kubernetes_pod_name
+            - action: labelmap
+              regex: __meta_kubernetes_node_label_(.+)
+            - target_label: __address__
+              replacement: kubernetes.default.svc:443
+            - source_labels:
+                - __meta_kubernetes_node_name
+              regex: (.+)
+              target_label: __metrics_path__
+              replacement: /api/v1/nodes/${1}/proxy/metrics
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
