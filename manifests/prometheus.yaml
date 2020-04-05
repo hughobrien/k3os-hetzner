@@ -10,7 +10,6 @@ metadata:
   namespace: prometheus
   name: prometheus
 data:
-
   entrypoint.sh: |
     #!/bin/sh
     set -xeu
@@ -42,12 +41,12 @@ data:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         relabel_configs:
-          - source_labels:
-              - __meta_kubernetes_namespace
-              - __meta_kubernetes_service_name
-              - __meta_kubernetes_endpoint_port_name
-          action: keep
-          regex: default;kubernetes;https
+          - action: keep
+            regex: default;kubernetes;https
+            source_labels:
+            - __meta_kubernetes_namespace
+            - __meta_kubernetes_service_name
+            - __meta_kubernetes_endpoint_port_name
 
       - job_name: kubernetes-cadvisor
         kubernetes_sd_configs:
@@ -61,11 +60,11 @@ data:
             regex: __meta_kubernetes_node_label_(.+)
           - target_label: __address__
             replacement: kubernetes.default.svc:443
-          - source_labels:
-              - __meta_kubernetes_node_name
+          - target_label: __metrics_path__
             regex: (.+)
-            target_label: __metrics_path__
             replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+            source_labels:
+              - __meta_kubernetes_node_name
 
       - job_name: kubernetes-nodes
         kubernetes_sd_configs:
@@ -75,15 +74,15 @@ data:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
         relabel_configs:
-            - action: labelmap
-              regex: __meta_kubernetes_node_label_(.+)
-            - target_label: __address__
-              replacement: kubernetes.default.svc:443
-            - source_labels:
-                - __meta_kubernetes_node_name
-              regex: (.+)
-              target_label: __metrics_path__
-              replacement: /api/v1/nodes/${1}/proxy/metrics
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - target_label: __metrics_path__
+            regex: (.+)
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+            source_labels:
+              - __meta_kubernetes_node_name
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
