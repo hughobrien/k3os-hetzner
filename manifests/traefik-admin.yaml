@@ -34,6 +34,11 @@ spec:
 ---
 apiVersion: v1
 kind: ConfigMap
+metadata:
+  namespace: kube-system
+  name: traefik
+  labels:
+    app: traefik
 data:
   traefik.toml: |
     logLevel = "info"
