@@ -7,7 +7,8 @@ k3os_user=rancher
 ssh_key=secrets/ssh-terraform
 ssh_opts="-o StrictHostKeyChecking=no"
 
-kaf="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl apply -f -"
+kubectl="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl"
+kaf="$kubectl apply -f -"
 
 longhorn_ver="v0.8.0"
 longhorn_controller="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
@@ -21,3 +22,6 @@ done
 for f in manifests/*; do
 	$kaf < "$f"
 done
+
+# We updated the traefik configmap so bounce the pods
+$kubectl delete pod -n kube-system -l app=traefik

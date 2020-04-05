@@ -1,0 +1,67 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: kube-system
+  name: traefik-api
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: traefik.k3s.hughobrien.ie
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: traefik-api
+              servicePort: dash
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  name: traefik-api
+  labels:
+    app: traefik-api
+spec:
+  selector:
+    app: traefik
+  type: ClusterIP
+  ports:
+    - port: 80
+      name: dash
+      targetPort: dash
+---
+apiVersion: v1
+kind: ConfigMap
+data:
+  traefik.toml: |
+    logLevel = "info"
+    defaultEntryPoints = ["http","https"]
+    [entryPoints]
+      [entryPoints.http]
+      address = ":80"
+      compress = true
+      [entryPoints.https]
+      address = ":443"
+      compress = true
+        [entryPoints.https.tls]
+          [[entryPoints.https.tls.certificates]]
+          CertFile = "/ssl/tls.crt"
+          KeyFile = "/ssl/tls.key"
+      [entryPoints.prometheus]
+      address = ":9100"
+      [entryPoints.api]
+      address = ":8080"
+    [ping]
+    entryPoint = "http"
+    [kubernetes]
+      [kubernetes.ingressEndpoint]
+      publishedService = "kube-system/traefik"
+    [traefikLog]
+      format = "json"
+    [metrics]
+      [metrics.prometheus]
+        entryPoint = "prometheus"
+    [api]
+    entryPoint = "api"
