@@ -21,4 +21,4 @@ presence = [
 
 # Choose your server type
 # Choices: cx[11|21|31|41|51]
-default_server_type = "cx11"
+default_server_type = "cx21"
