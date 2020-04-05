@@ -235,8 +235,8 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: prometheus
   namespace: prometheus
+  name: prometheus
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -248,5 +248,5 @@ roleRef:
   name: prometheus
 subjects:
   - kind: ServiceAccount
-    name: prometheus
     namespace: prometheus
+    name: prometheus
