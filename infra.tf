@@ -33,7 +33,7 @@ resource "hcloud_server" "hosts" {
   name        = each.key
   image       = var.default_image
   rescue      = var.default_rescue
-  server_type = var.default_server_type
+  server_type = each.value["idx"] == 0 ? var.master_server_type : var.node_server_type
   ssh_keys    = [hcloud_ssh_key.ssh-terraform.id]
   provisioner "local-exec" {
     command = <<-EOT

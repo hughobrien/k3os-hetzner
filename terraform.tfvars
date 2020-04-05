@@ -19,6 +19,7 @@ presence = [
 #  { "region" : "helsinki", "code" : "hel1", "count" : 1 },
 #]
 
-# Choose your server type
+# Choose your server types
 # Choices: cx[11|21|31|41|51]
-default_server_type = "cx21"
+master_server_type = "cx11"
+node_server_type   = "cx21"
