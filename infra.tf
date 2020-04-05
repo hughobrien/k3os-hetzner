@@ -38,18 +38,18 @@ resource "hcloud_server" "hosts" {
   provisioner "local-exec" {
     command = <<-EOT
     bash provision-local.sh \
-		${each.value["idx"]} \
-		${self.name} \
-		${self.ipv4_address} \
-		${cidrhost(var.network["host"], each.value["idx"] + var.default_cidr_offset)} \
-		${split("/", var.network["host"])[1]} \
-		${self.location} \
-		${self.datacenter} \
-		${self.server_type} \
-		${var.default_k3os_ver} \
-		${cidrhost(var.network["host"], var.default_cidr_offset)} \
-		'${random_password.cluster_secret.result}'
-		EOT
+        ${each.value["idx"]} \
+        ${self.name} \
+        ${self.ipv4_address} \
+        ${cidrhost(var.network["host"], each.value["idx"] + var.default_cidr_offset)} \
+        ${split("/", var.network["host"])[1]} \
+        ${self.location} \
+        ${self.datacenter} \
+        ${self.server_type} \
+        ${var.default_k3os_ver} \
+        ${cidrhost(var.network["host"], var.default_cidr_offset)} \
+        '${random_password.cluster_secret.result}'
+        EOT
   }
 }
 
