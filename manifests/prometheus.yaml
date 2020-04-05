@@ -32,6 +32,20 @@ data:
         static_configs:
           - targets:
               - traefik-prometheus.kube-system:9100
+      - job_name: kubernetes-apiservers
+        kubernetes_sd_configs:
+        - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - source_labels:
+          - __meta_kubernetes_namespace
+          - __meta_kubernetes_service_name
+          - __meta_kubernetes_endpoint_port_name
+          action: keep
+          regex: default;kubernetes;https
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
@@ -100,6 +114,7 @@ spec:
       labels:
         app: prometheus
     spec:
+      serviceAccountName: prometheus
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
@@ -150,3 +165,51 @@ spec:
           configMap:
             name: prometheus
             defaultMode: 0500
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: prometheus
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - nonResourceURLs:
+    - /metrics
+    verbs:
+      - get
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: prometheus
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: prometheus
