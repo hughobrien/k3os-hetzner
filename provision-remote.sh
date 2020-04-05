@@ -67,30 +67,23 @@ if [ "$node_idx" -eq 0 ]; then
 k3os:
   k3s_args:
   - server
-  - --cluster-init
+  - --flannel-backend=$flannel_mode
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
-  - --flannel-backend=$flannel_mode
-  - --node-ip=$node_ipv4_private
-  - --node-external-ip=$node_ipv4_public
-  token: $cluster_secret
 EOF
 else
 	cat << EOF >> "$config_file"
 k3os:
   k3s_args:
-  - server
+  - agent
   - --server=$cluster_url
-  - --bind-address=$node_ipv4_private
-  - --advertise-address=$node_ipv4_private
-  - --flannel-backend=$flannel_mode
-  - --node-ip=$node_ipv4_private
-  - --node-external-ip=$node_ipv4_public
-  token: $cluster_secret
 EOF
 fi
 
 cat << EOF >> "$config_file"
+  - --node-ip=$node_ipv4_private
+  - --node-external-ip=$node_ipv4_public
+  token: $cluster_secret
   labels:
     datacenter: $node_datacenter
     location: $node_location
