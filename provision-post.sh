@@ -16,6 +16,12 @@ one_off_manifest=${2:-""}
 longhorn_ver="v0.8.0"
 longhorn_controller="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
 
+# ensure traefik is already installed
+while [ "$($kubectl get configmap -n kube-system traefik | wc -l)" != 2 ] ; do
+	sleep 5
+done
+
+
 # shellcheck disable=SC2066
 for url in "$longhorn_controller"; do
 	curl --silent "$url" | $kaf
