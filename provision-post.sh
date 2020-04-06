@@ -19,12 +19,6 @@ longhorn_manifest="https://raw.githubusercontent.com/longhorn/longhorn/${longhor
 certmanager_ver="v0.14.1"
 certmanager_manifest="https://github.com/jetstack/cert-manager/releases/download/${certmanager_ver}/cert-manager.yaml"
 
-# ensure traefik is already installed
-while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 ] ; do
-	sleep 5
-done
-
-
 for url in \
 	"$longhorn_manifest" \
 	"$certmanager_manifest"; do
@@ -34,6 +28,3 @@ done
 for f in manifests/*; do
 	$kaf < "$f"
 done
-
-# We updated the traefik configmap so bounce the pods
-$kubectl delete pod -n kube-system -l app=traefik
