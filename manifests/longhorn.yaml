@@ -5,7 +5,6 @@ metadata:
   namespace: longhorn-system
   name: longhorn-ingress
   annotations:
-    kubernetes.io/ingress.class: traefik
 spec:
   rules:
     - host: longhorn.k3s.hughobrien.ie
