@@ -24,16 +24,17 @@ while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 
 	sleep 5
 done
 
-# ensure certmanager is ready
-while [ "$($kubectl get pods -n cert-manager -l app=webhook | wc -l | xargs)" != 2 ] ; do
-	sleep 5
-done
-
 for url in \
 	"$longhorn_manifest" \
 	"$certmanager_manifest"; do
 	curl --location --silent "$url" | $kaf
 done
+
+# ensure certmanager is ready
+while [ "$($kubectl get pods -n cert-manager -l app=webhook | wc -l | xargs)" != 2 ] ; do
+	sleep 5
+done
+
 
 for f in manifests/*; do
 	$kaf < "$f"
