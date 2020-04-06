@@ -39,6 +39,3 @@ done
 for f in manifests/*; do
 	$kaf < "$f"
 done
-
-# We updated the traefik configmap so bounce the pods
-$kubectl delete pod -n kube-system -l app=traefik

@@ -45,10 +45,11 @@ run_cmd:
 write_files:
 - path: /home/rancher/.bash_profile
   content: |
-    alias k=kubectl
+    alias k='kubectl'
     alias pods='kubectl get pods --all-namespaces --watch'
     alias orders='kubectl get orders --all-namespaces --watch'
     alias csrs='kubectl get certificaterequests --all-namespaces --watch'
+    alias ingress='kubectl get ingress --all-namespaces --watch'
   owner: rancher
   permissions: '0644'
   encoding: ""
@@ -61,6 +62,27 @@ write_files:
           - http://10.43.14.192
   owner: root
   permissions: '0644'
+  encoding: ""
+- path: /var/lib/rancher/k3s/server/manifests/traefik.yaml
+  content: |
+    apiVersion: helm.cattle.io/v1
+    kind: HelmChart
+    metadata:
+      name: traefik
+      namespace: kube-system
+    spec:
+      chart: https://%{KUBERNETES_API}%/static/charts/traefik-1.81.0.tgz
+      set:
+        rbac.enabled: "true"
+        ssl.enabled: "true"
+        metrics.prometheus.enabled: "true"
+        kubernetes.ingressEndpoint.useDefaultPublishedService: "true"
+        dashboard.enabled: "true"
+        dashboard.domain: "traefik.k3s.hughobrien.ie"
+        dashboard.ingress.annotations:
+          foo: "bar"
+  owner: root
+  permissions: '0600'
   encoding: ""
 EOF
 
