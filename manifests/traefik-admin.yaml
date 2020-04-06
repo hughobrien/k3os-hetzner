@@ -6,6 +6,7 @@ metadata:
   name: traefik-api
   annotations:
     kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt
 spec:
   rules:
     - host: traefik.k3s.hughobrien.ie
@@ -15,6 +16,10 @@ spec:
             backend:
               serviceName: traefik-api
               servicePort: dash
+  tls:
+    - hosts:
+        - traefik.k3s.hughobrien.ie
+      secretName: traefik-cert
 ---
 apiVersion: v1
 kind: Service
