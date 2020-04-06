@@ -47,6 +47,8 @@ write_files:
   content: |
     alias k=kubectl
     alias pods='kubectl get pods --all-namespaces --watch'
+    alias orders='kubectl get orders --all-namespaces --watch'
+    alias csrs='kubectl get certificaterequests --all-namespaces --watch'
   owner: rancher
   permissions: '0644'
   encoding: ""
