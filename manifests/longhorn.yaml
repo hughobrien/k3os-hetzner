@@ -15,3 +15,14 @@ spec:
             backend:
               serviceName: longhorn-frontend
               servicePort: 80
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: longhorn2
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+parameters:
+  numberOfReplicas: "2"
+  staleReplicaTimeout: "2880"  # 48 hours in minutes
+  fromBackup: ""
