@@ -6,6 +6,7 @@ metadata:
   name: traefik-api
   annotations:
     kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   rules:
