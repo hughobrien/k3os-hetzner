@@ -11,3 +11,4 @@ kubectl="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl"
 
 $kubectl get secret -n prometheus prometheus-cert -o yaml > secrets/prometheus-cert.yaml
 $kubectl get secret -n longhorn-system longhorn-cert -o yaml > secrets/longhorn-cert.yaml
+$kubectl get secret -n kube-system traefik-cert -o yaml > secrets/traefik-cert.yaml

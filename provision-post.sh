@@ -43,8 +43,8 @@ for namespace in prometheus; do
 	$kubectl create namespace "$namespace"
 done
 
-for cert in "secrets/prometheus-cert.yaml" "secrets/longhorn-cert.yaml"; do
-	[ -e "$cert" ] && $kaf < "$cert"
+for service in prometheus longhorn traefik; do
+	[ -e "secrets/${service}-cert" ] && $kaf < "secrets/${service}-cert"
 done
 
 for f in manifests/*; do
