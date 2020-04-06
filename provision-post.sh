@@ -31,7 +31,7 @@ for url in \
 done
 
 # ensure certmanager is ready
-while [ "$($kubectl get pods -n cert-manager -l app=webhook | wc -l | xargs)" != 2 ] ; do
+while [ "$($kubectl get pods -n cert-manager -l app=webhook -o json | jq '.items[0].status.containerStatuses[0].ready')" != true ]; do
 	sleep 5
 done
 
