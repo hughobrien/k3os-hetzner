@@ -16,7 +16,7 @@ data:
     /bin/prometheus \
     --config.file=/config/prometheus.yml \
     --storage.tsdb.path=/data \
-    --storage.tsdb.retention.size=1GB \
+    --storage.tsdb.retention.size=3GB \
     --storage.tsdb.wal-compression
 
   prometheus.yml: |
@@ -130,7 +130,7 @@ spec:
   storageClassName: longhorn2
   resources:
     requests:
-      storage: 2Gi
+      storage: 4Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
