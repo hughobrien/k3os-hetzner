@@ -11,7 +11,10 @@ kubectl="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl"
 kaf="$kubectl apply -f -"
 
 one_off_manifest=${2:-""}
-[ "$one_off_manifest" ] && { $kaf < "$one_off_manifest"; exit 0; }
+[ "$one_off_manifest" ] && {
+	$kaf < "$one_off_manifest"
+	exit 0
+}
 
 longhorn_ver="v0.8.0"
 longhorn_manifest="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
@@ -20,7 +23,7 @@ certmanager_ver="v0.14.1"
 certmanager_manifest="https://github.com/jetstack/cert-manager/releases/download/${certmanager_ver}/cert-manager.yaml"
 
 # ensure traefik is already installed
-while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 ] ; do
+while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 ]; do
 	sleep 5
 done
 
@@ -35,6 +38,14 @@ while [ "$($kubectl get pods -n cert-manager -l app=webhook -o json | jq '.items
 	sleep 5
 done
 
+# shellcheck disable=SC2043
+for namespace in prometheus; do
+	$kubectl create namespace "$namespace"
+done
+
+for cert in "secrets/prometheus-cert.yaml" "secrets/longhorn-cert.yaml"; do
+	[ -e "$cert" ] && $kaf < "$cert"
+done
 
 for f in manifests/*; do
 	$kaf < "$f"
