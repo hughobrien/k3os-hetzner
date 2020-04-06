@@ -14,7 +14,10 @@ one_off_manifest=${2:-""}
 [ "$one_off_manifest" ] && { $kaf < "$one_off_manifest"; exit 0; }
 
 longhorn_ver="v0.8.0"
-longhorn_controller="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
+longhorn_manifest="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
+
+certmanager_ver="v0.14.1"
+certmanager_manifest="https://github.com/jetstack/cert-manager/releases/download/${certmanager_ver}/cert-manager.yaml"
 
 # ensure traefik is already installed
 while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 ] ; do
@@ -22,12 +25,12 @@ while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 
 done
 
 
-# shellcheck disable=SC2066
-for url in "$longhorn_controller"; do
-	curl --silent "$url" | $kaf
+for url in \
+	"$longhorn_manifest" \
+	"$certmanager_manifest"; do
+	curl --location --silent "$url" | $kaf
 done
 
-# shellcheck disable=SC2043
 for f in manifests/*; do
 	$kaf < "$f"
 done
