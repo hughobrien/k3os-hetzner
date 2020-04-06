@@ -46,6 +46,7 @@ write_files:
 - path: /home/rancher/.bash_profile
   content: |
     alias k=kubectl
+    alias pods=kubectl get pods --all-namespaces --watch
   owner: rancher
   permissions: '0644'
   encoding: ""
