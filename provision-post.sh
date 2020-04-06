@@ -17,7 +17,7 @@ longhorn_ver="v0.8.0"
 longhorn_controller="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
 
 # ensure traefik is already installed
-while [ "$($kubectl get configmap -n kube-system traefik | wc -l)" != 2 ] ; do
+while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 ] ; do
 	sleep 5
 done
 
