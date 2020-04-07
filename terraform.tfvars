@@ -21,5 +21,5 @@ presence = [
 
 # Choose your server types
 # Choices: cx[11|21|31|41|51]
-master_server_type = "cx11"
+master_server_type = "cx21"
 node_server_type   = "cx21"

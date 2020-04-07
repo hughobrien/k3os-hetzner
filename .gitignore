@@ -1,6 +1,7 @@
 .terraform*
 k3os-kernel/
 k3os/
+k3s/
 longhorn/
 scratch/
 secrets/
