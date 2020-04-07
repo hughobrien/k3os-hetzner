@@ -23,11 +23,7 @@ longhorn_manifest="https://raw.githubusercontent.com/longhorn/longhorn/${longhor
 certmanager_ver="v0.14.1"
 certmanager_manifest="https://github.com/jetstack/cert-manager/releases/download/${certmanager_ver}/cert-manager.yaml"
 
-# ensure traefik is already installed
-while [ "$($kubectl get configmap -n kube-system traefik | wc -l | xargs)" != 2 ]; do
-	sleep 5
-done
-
+# need to pre-create these so we can restore the TLS certs to them
 for namespace in prometheus longhorn-system; do
 	$kubectl create namespace "$namespace" || true
 done
@@ -46,8 +42,6 @@ done
 while [ "$($kubectl get pods -n cert-manager -l app=webhook -o json | jq '.items[0].status.containerStatuses[0].ready')" != true ]; do
 	sleep 5
 done
-
-$ssh 'sudo tee /var/lib/rancher/k3s/server/manifests/traefik.yaml' < traefik/traefik-helm.yaml
 
 for f in manifests/*; do
 	$kaf < "$f"

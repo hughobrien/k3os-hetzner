@@ -43,30 +43,6 @@ hostname: $node_name
 run_cmd:
 - sh -c "ip route add ${network_cidr} via ${network_gw} dev ${network_gw_dev} || reboot"
 write_files:
-- path: /var/lib/rancher/k3s/server/manifests/traefik.yaml
-  content: |
-    apiVersion: helm.cattle.io/v1
-    kind: HelmChart
-    metadata:
-      name: traefik
-      namespace: kube-system
-    spec:
-      chart: https://%{KUBERNETES_API}%/static/charts/traefik-1.81.0.tgz
-      set:
-        rbac.enabled: "true"
-        ssl.enabled: "true"
-        metrics.prometheus.enabled: "true"
-        kubernetes.ingressEndpoint.useDefaultPublishedService: "true"
-        dashboard.enabled: "true"
-        dashboard.domain: "traefik.k3s.hughobrien.ie"
-        dashboard.ingress.annotations.kubernetes\.io/ingress\.class: "traefik"
-        dashboard.ingress.annotations.traefik\.ingress\.kubernetes\.io/redirect-entry-point: "https"
-        dashboard.ingress.annotations.cert-manager\.io/cluster-issuer: "letsencrypt"
-        dashboard.ingress.tls[0].hosts[0]: "traefik.k3s.hughobrien.ie"
-        dashboard.ingress.tls[0].secretName: "traefik-cert"
-  owner: root
-  permissions: '0600'
-  encoding: ""
 - path: /home/rancher/.bash_profile
   content: |
     alias k='kubectl'
@@ -85,6 +61,7 @@ if [ "$node_idx" -eq 0 ]; then
 k3os:
   k3s_args:
   - server
+  - --no-deploy=traefik
   - --flannel-backend=$flannel_mode
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private

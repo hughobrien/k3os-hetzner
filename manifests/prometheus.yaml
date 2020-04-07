@@ -23,11 +23,6 @@ data:
           - targets:
               - localhost:9090
 
-      - job_name: traefik
-        static_configs:
-          - targets:
-              - traefik-prometheus.kube-system:9100
-
       - job_name: kubernetes-apiservers
         kubernetes_sd_configs:
           - role: endpoints
@@ -85,8 +80,7 @@ metadata:
   namespace: prometheus
   name: prometheus
   annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   rules:
