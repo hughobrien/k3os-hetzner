@@ -47,7 +47,7 @@ while [ "$($kubectl get pods -n cert-manager -l app=webhook -o json | jq '.items
 	sleep 5
 done
 
-$ssh 'sudo tee /var/lib/rancher/k3s/server/manifests/traefik.yaml' < traefik.yaml
+$ssh 'sudo tee /var/lib/rancher/k3s/server/manifests/traefik.yaml' < traefik/traefik-helm.yaml
 
 for f in manifests/*; do
 	$kaf < "$f"
