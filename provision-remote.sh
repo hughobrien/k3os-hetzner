@@ -43,26 +43,6 @@ hostname: $node_name
 run_cmd:
 - sh -c "ip route add ${network_cidr} via ${network_gw} dev ${network_gw_dev} || reboot"
 write_files:
-- path: /home/rancher/.bash_profile
-  content: |
-    alias k='kubectl'
-    alias pods='kubectl get pods --all-namespaces --watch'
-    alias orders='kubectl get orders --all-namespaces --watch'
-    alias csrs='kubectl get certificaterequests --all-namespaces --watch'
-    alias ingress='kubectl get ingress --all-namespaces --watch'
-  owner: rancher
-  permissions: '0644'
-  encoding: ""
-- path: /etc/rancher/k3s/registries.yaml
-  content: |
-    ---
-    mirrors:
-      registry.local:
-        endpoint:
-          - http://10.43.14.192
-  owner: root
-  permissions: '0644'
-  encoding: ""
 - path: /var/lib/rancher/k3s/server/manifests/traefik.yaml
   content: |
     apiVersion: helm.cattle.io/v1
@@ -79,10 +59,23 @@ write_files:
         kubernetes.ingressEndpoint.useDefaultPublishedService: "true"
         dashboard.enabled: "true"
         dashboard.domain: "traefik.k3s.hughobrien.ie"
-        dashboard.ingress.annotations:
-          foo: "bar"
+        dashboard.ingress.annotations.kubernetes\.io/ingress\.class: "traefik"
+        dashboard.ingress.annotations.traefik\.ingress\.kubernetes\.io/redirect-entry-point: "https"
+        dashboard.ingress.annotations.cert-manager\.io/cluster-issuer: "letsencrypt"
+        dashboard.ingress.tls[0].hosts[0]: "traefik.k3s.hughobrien.ie"
+        dashboard.ingress.tls[0].secretName: "traefik-cert"
   owner: root
   permissions: '0600'
+  encoding: ""
+- path: /home/rancher/.bash_profile
+  content: |
+    alias k='kubectl'
+    alias pods='kubectl get pods --all-namespaces --watch'
+    alias orders='kubectl get orders --all-namespaces --watch'
+    alias csrs='kubectl get certificaterequests --all-namespaces --watch'
+    alias ingress='kubectl get ingress --all-namespaces --watch'
+  owner: rancher
+  permissions: '0644'
   encoding: ""
 EOF
 
