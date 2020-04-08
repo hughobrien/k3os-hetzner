@@ -1,5 +1,4 @@
 .terraform*
-ca/
 k3os-kernel/
 k3os/
 k3s/

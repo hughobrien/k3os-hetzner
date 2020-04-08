@@ -7,6 +7,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/auth-tls-secret: "ingress-nginx/mtls-cert"
 spec:
   rules:
     - host: longhorn.k3s.hughobrien.ie
