@@ -18,11 +18,6 @@ data:
     global:
       scrape_interval: 20s
     scrape_configs:
-      - job_name: prometheus
-        static_configs:
-          - targets:
-              - localhost:9090
-
       - job_name: kubernetes-apiservers
         kubernetes_sd_configs:
           - role: endpoints
@@ -73,6 +68,27 @@ data:
             replacement: /api/v1/nodes/${1}/proxy/metrics
             source_labels:
               - __meta_kubernetes_node_name
+
+      - job_name: kubernetes-pods
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            regex: true
+            action: keep
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            action: replace
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
@@ -147,6 +163,9 @@ spec:
     metadata:
       labels:
         app: prometheus
+      annotations:
+        prometheus.io/port: "9090"
+        prometheus.io/scrape: "true"
     spec:
       serviceAccountName: prometheus
       securityContext:
