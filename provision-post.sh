@@ -24,7 +24,7 @@ ingress_nginx_manifest_url2="https://raw.githubusercontent.com/kubernetes/ingres
 longhorn_ver="v0.8.0"
 longhorn_manifest_url="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
 
-certmanager_ver="v0.14.1"
+certmanager_ver="v0.14.2"
 certmanager_manifest_url="https://github.com/jetstack/cert-manager/releases/download/${certmanager_ver}/cert-manager.yaml"
 
 # need to pre-create these so we can restore the TLS certs to them
