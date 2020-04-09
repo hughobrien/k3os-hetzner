@@ -14,6 +14,7 @@ data:
     --storage.tsdb.retention.size=3GB \
     --storage.tsdb.wal-compression
 
+  # https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus-kubernetes.yml
   prometheus.yml: |
     global:
       scrape_interval: 20s
