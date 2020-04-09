@@ -50,6 +50,7 @@ write_files:
     alias orders='kubectl get orders --all-namespaces --watch'
     alias csrs='kubectl get certificaterequests --all-namespaces --watch'
     alias ingress='kubectl get ingress --all-namespaces --watch'
+    alias services='kubectl get services --all-namespaces --watch'
   owner: rancher
   permissions: '0644'
   encoding: ""
