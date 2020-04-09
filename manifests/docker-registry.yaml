@@ -60,6 +60,8 @@ spec:
   selector:
     matchLabels:
       app: docker-registry
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
