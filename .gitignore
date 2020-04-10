@@ -1,10 +1,4 @@
-.terraform*
-k3os-kernel/
-k3os/
-k3s/
-longhorn/
-scratch/
+.terraform/
 secrets/
 src/
-terraform
 terraform.tfstate*

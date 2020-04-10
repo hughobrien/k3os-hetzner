@@ -23,7 +23,7 @@ for f in *.sh; do
 done
 
 for f in manifests/*; do
-	yamllint "$f"
+	yamllint -c .yamllint "$f"
 done
 
 export HCLOUD_TOKEN

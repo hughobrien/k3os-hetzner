@@ -2,8 +2,7 @@
 
 set -euo pipefail
 
-hetzner_secret_file="secrets/hetzner-token"
-HCLOUD_TOKEN=$(cat "$hetzner_secret_file")
+HCLOUD_TOKEN=$(cat "secrets/hetzner-token")
 
 hosting_file="secrets/hosting"
 [ -f "$hosting_file" ] && hosting=$(cat "$hosting_file")
