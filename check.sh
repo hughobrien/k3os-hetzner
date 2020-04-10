@@ -10,12 +10,16 @@ for cmd in terraform shfmt shellcheck; do
 done
 
 HCLOUD_TOKEN=$(cat secrets/hetzner-token)
+export HCLOUD_TOKEN
 
 set -x
 
+pushd terraform
 for f in *.tf terraform.tfvars; do
 	terraform fmt "$f"
 done
+terraform validate
+popd
 
 for f in *.sh; do
 	shellcheck "$f"
@@ -25,7 +29,3 @@ done
 for f in manifests/*; do
 	yamllint -c .yamllint "$f"
 done
-
-export HCLOUD_TOKEN
-
-terraform validate

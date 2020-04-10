@@ -37,7 +37,7 @@ resource "hcloud_server" "hosts" {
   ssh_keys    = [hcloud_ssh_key.ssh-terraform.id]
   provisioner "local-exec" {
     command = <<-EOT
-    bash provision-local.sh \
+    bash ../provision-local.sh \
         ${each.value["idx"]} \
         ${self.name} \
         ${self.ipv4_address} \
@@ -73,7 +73,7 @@ resource "hcloud_server_network" "network_bindings" {
 
 resource "hcloud_ssh_key" "ssh-terraform" {
   name       = "Terraform SSH key"
-  public_key = file("secrets/ssh-terraform.pub")
+  public_key = file("../secrets/ssh-terraform.pub")
 }
 
 resource "random_password" "cluster_secret" {
