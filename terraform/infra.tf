@@ -115,3 +115,7 @@ output "conn_str" {
     "${host.idx} ${host.name}" => "ssh -i secrets/ssh-terraform -o StrictHostKeyChecking=no rancher@${hcloud_server.hosts[host.name].ipv4_address}"
   }
 }
+
+output "now run" {
+  value = "export k3s_ip=${[for host in local.hosts_named : hcloud_server.hosts[host.name].ipv4_address if host.idx == 0][0]}; ./configure-local $k3s_ip && ./configure-remote $k3s_ip"
+}
