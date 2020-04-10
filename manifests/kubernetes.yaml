@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: default
+  name: kubernetes
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/auth-tls-secret: "ingress-nginx/mtls-cert"
+spec:
+  rules:
+    - host: k3s.hughobrien.ie
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: kubernetes
+              servicePort: https
+  tls:
+    - hosts:
+        - k3s.hughobrien.ie
+      secretName: k3s-cert

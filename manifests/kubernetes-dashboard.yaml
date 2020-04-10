@@ -42,6 +42,3 @@ subjects:
   - kind: ServiceAccount
     name: admin-user
     namespace: kubernetes-dashboard
-
-
-# kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get secret | grep admin-user | awk '{print $1}') -o json | jq -r  '.data.token | @base64d' > token

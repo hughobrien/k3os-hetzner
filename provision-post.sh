@@ -30,10 +30,23 @@ certmanager_manifest_url="https://github.com/jetstack/cert-manager/releases/down
 dashboard_ver="v2.0.0-beta8"
 dashboard_manifest_url="https://raw.githubusercontent.com/kubernetes/dashboard/${dashboard_ver}/aio/deploy/recommended.yaml"
 
+argo_workflows_ver="v2.7.1"
+argo_workflows_manifest_url="https://raw.githubusercontent.com/argoproj/argo/${argo_workflows_ver}/manifests/install.yaml"
+
+argo_cd_ver="v1.5.1"
+argo_cd_manifest_url="kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${argo_cd_ver}/manifests/install.yaml"
+
+# need to pre-create these so we can restore the TLS certs to them
+for namespace in prometheus argo argocd; do
+	$kubectl create namespace "$namespace" || true
+done
+
 for url in \
 	"$ingress_nginx_manifest_url1" \
 	"$ingress_nginx_manifest_url2" \
 	"$longhorn_manifest_url" \
+	"$argo_workflows_manifest_url" \
+	"$argo_cd_manifest_url" \
 	"$dashboard_manifest_url" \
 	"$certmanager_manifest_url"; do
 	curl --location --silent "$url" | $kaf
@@ -42,15 +55,12 @@ done
 # make ingress an LB so that svclb picks it up
 $kubectl patch service -n ingress-nginx ingress-nginx -p \''{"spec":{"type":"LoadBalancer"}}'\'
 
+
+$kubectl patch deploy argocd-server -n argocd --type json -p \'[{"op": "add", "path": "/spec/template/spec/containers/0/command/-", "value": "--disable-auth"}]'\'
+
 # ensure certmanager is ready
 while [ "$($kubectl get pods -n cert-manager -l app=webhook -o json | jq '.items[0].status.containerStatuses[0].ready')" != true ]; do
 	sleep 5
-done
-
-# shellcheck disable=SC2043
-# need to pre-create these so we can restore the TLS certs to them
-for namespace in prometheus; do
-	$kubectl create namespace "$namespace" || true
 done
 
 for tls_cert in secrets/*-cert.yaml; do
