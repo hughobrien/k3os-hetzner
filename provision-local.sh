@@ -19,6 +19,9 @@ script_name=provision-remote.sh
 script_dest="/tmp/${script_name}"
 ssh_opts="-o StrictHostKeyChecking=no"
 
+# cd to script dir
+cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >& /dev/null && pwd )"
+
 # remove existing ssh keys
 ssh-keygen -R "$node_ipv4_public"
 set +e

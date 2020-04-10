@@ -12,6 +12,8 @@ set -x
 export HCLOUD_TOKEN
 export hosting
 
+pushd terraform
+
 destroy=${destroy:-""}
 [ "$destroy" ] && terraform destroy -auto-approve
 
