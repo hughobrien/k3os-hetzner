@@ -48,6 +48,7 @@ client_key="secrets/client.key"
 client_crt="secrets/client.crt"
 client_req="secrets/client.req"
 client_p12="secrets/client.p12"
+days="3650"
 if [ -f "$ingress_cert" ]; then
 	$kubectl apply -f - < "$ingress_cert"
 else
@@ -55,9 +56,10 @@ else
 	mkdir -p "$(dirname "$ca_pw")"
 	openssl rand -out "$ca_pw" -hex 32
 	# ca key
-	openssl req -new -newkey rsa:4096 \
-		-days 36500 -x509 -subj "$subj" \
-		-keyout "$ca_key" -out "$ca_crt" -passout file:"$ca_pw"
+	openssl req -newkey rsa:4096 \
+		-keyform PEM -outform PEM \
+		-days "$days" -x509 -subj "$subj" \
+		-passout file:"$ca_pw" -keyout "$ca_key" -out "$ca_crt"
 	#  client key
 	openssl genrsa -out "$client_key" 4096
 	# client signing request
@@ -66,10 +68,10 @@ else
 	# sign client request with ca key
 	openssl x509 -req \
 		-CA "$ca_crt" -CAkey "$ca_key" -passin file:"$ca_pw" \
-		-set_serial 101 -days 3650 \
-		-in "$client_req" -out "$client_crt"
+		-set_serial 101 -extensions client -days "$days" \
+		-in "$client_req" -out "$client_crt" -outform PEM
 	# export as p12 for browsers
-	openssl pkcs12 -export -passout pass:"" \
+	openssl pkcs12 -export -passout pass:"k3s.hughobrien.ie" \
 		-inkey "$client_key" -in "$client_crt" -out "$client_p12"
 	# add to cluster for nginx mtls reference
 	kubectl create secret generic -n ingress-nginx ingress-ca-cert \
