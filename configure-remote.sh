@@ -104,7 +104,7 @@ kubectl config set-credentials k3s \
 # wait for api cert
 while [ ! "$($kubectl get secret k3s-cert -o jsonpath='{.data.tls\.crt}')" ]; do
 	$kubectl get pods
-	$kubectl get orders -o json | jq '.items[].status'
+	$kubectl get orders -o jsonpath='{.items[].status.state}'
 	echo awaiting LE cert provisioning
 	sleep 30
 done
