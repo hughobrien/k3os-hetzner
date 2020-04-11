@@ -93,4 +93,11 @@ kubectl config set-credentials k3s \
 	--client-key="$client_key" \
 	--client-certificate="$client_crt" \
 	--embed-certs
+
+# wait for api cert
+while [ ! "$($kubectl get secret k3s-cert -o jsonpath='{.data.tls\.crt}')" ]; do
+	$kubectl get pods
+	sleep 30
+done
+
 kubectl get nodes -o wide || echo perhaps LE cert is not ready yet
