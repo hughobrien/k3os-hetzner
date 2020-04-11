@@ -20,7 +20,7 @@ ssh_opts="-o StrictHostKeyChecking=no"
 ssh="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public}"
 kubectl="$ssh kubectl"
 
-while [ ! $($ssh hostname) ]; do
+while [ ! "$($ssh hostname)" ]; do
 	sleep 10
 	echo waiting for host
 done
