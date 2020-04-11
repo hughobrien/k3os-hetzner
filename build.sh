@@ -2,7 +2,20 @@
 
 set -euo pipefail
 
-HCLOUD_TOKEN=$(cat "secrets/hetzner-token")
+hcloud_secret_file="secrets/hetzner-token"
+
+[ ! -f "$hcloud_secret_file" ] && {
+	echo provide hetzner token "$hcloud_secret_file"
+	exit 1
+}
+
+ssh_key="secrets/ssh-terraform"
+[ ! -f "$ssh_key" ] && {
+	echo generate ssh key "$ssh_key"
+	exit 1
+}
+
+HCLOUD_TOKEN=$(cat "$hcloud_secret_file")
 
 hosting_file="secrets/hosting"
 [ -f "$hosting_file" ] && hosting=$(cat "$hosting_file")
