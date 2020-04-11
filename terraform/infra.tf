@@ -117,5 +117,5 @@ output "conn_str" {
 }
 
 output "now_run" {
-  value = "export k3s_ip=${[for host in local.hosts_named : hcloud_server.hosts[host.name].ipv4_address if host.idx == 0][0]}; ./configure-local $k3s_ip && ./configure-remote $k3s_ip"
+  value = "export k3s_ip=${[for host in local.hosts_named : hcloud_server.hosts[host.name].ipv4_address if host.idx == 0][0]}; ./configure-local.sh $k3s_ip && ./configure-remote.sh $k3s_ip"
 }
