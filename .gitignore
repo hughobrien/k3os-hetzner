@@ -1,4 +1,5 @@
 scratch
+secrets.tgz
 secrets/
 terraform/.terraform
 terraform/.terraform.tfstate.lock.info
