@@ -1,73 +1,96 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
-# shellcheck disable=SC2016
-jq_ns_template='{"apiVersion": "v1", "kind": "Namespace", "metadata": {"name": $ns}}'
+# This setups up remote access so later provisioning can proceed locally
+# The K8s API is exposed via an nginx mtls ingress for additional protection
 
-longhorn_ver="v0.8.0"
-longhorn_manifest_url="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
+certmanager_ver="v0.14.2"
+certmanager_manifest_url="https://github.com/jetstack/cert-manager/releases/download/${certmanager_ver}/cert-manager.yaml"
 
-argo_workflows_ver="v2.7.2"
-argo_workflows_manifest_url="https://raw.githubusercontent.com/argoproj/argo/${argo_workflows_ver}/manifests/install.yaml"
+ingress_nginx_ver="nginx-0.30.0"
+ingress_nginx_manifest_url1="https://raw.githubusercontent.com/kubernetes/ingress-nginx/${ingress_nginx_ver}/deploy/static/mandatory.yaml"
+ingress_nginx_manifest_url2="https://raw.githubusercontent.com/kubernetes/ingress-nginx/${ingress_nginx_ver}/deploy/static/provider/baremetal/service-nodeport.yaml"
 
-argo_cd_ver="v1.5.1"
-argo_cd_manifest_url="kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/${argo_cd_ver}/manifests/install.yaml"
+node_ipv4_public="$1"
+k3os_user=rancher
+ssh_key=secrets/ssh-terraform
+ssh_opts="-o StrictHostKeyChecking=no"
 
-# longhorn
-kubectl apply -f "$longhorn_manifest_url"
-longhorn_cert="secrets/longhorn-cert.yaml"
-[ -f "$longhorn_cert" ] && kubectl apply -f "$longhorn_cert"
-kubectl apply -f manifests/longhorn-ingress-storageclass.yaml
+# NB: kubectl is local. $kubectl is remote
+kubectl="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl"
 
-# docker registry
-jq -n --arg ns docker-registry "$jq_ns_template" | kubectl apply -f -
-docker_registry_cert="secrets/registry-cert.yaml"
-[ -f "$docker_registry_cert" ] && kubectl apply -f "$docker_registry_cert"
+# preconfig for dry-run yaml generation
+kubectl config set-cluster k3s --server=https://k3s.hughobrien.ie
+kubectl config set-credentials k3s --username=admin
+kubectl config set-context k3s --cluster=k3s --user=k3s
+kubectl config use-context k3s
 
-docker_registry_htpasswd="secrets/registry-htpasswd.yaml"
-docker_registry_credentials="secrets/registry-credentials.yaml"
+# ingress-nginx
+$kubectl apply -f "$ingress_nginx_manifest_url1"
+$kubectl apply -f "$ingress_nginx_manifest_url2"
+# make ingress an LB so that svclb picks it up
+$kubectl patch service -n ingress-nginx ingress-nginx \
+	-p \''{"spec":{"type":"LoadBalancer"}}'\'
 
-if [ ! -f "$docker_registry_htpasswd" ]; then
-	docker_registry_password="secrets/registry.pw"
-	docker_registry_user="k3s"
-	openssl rand -out "$docker_registry_password" -hex 32
-
-	kubectl create secret generic -n docker-registry \
-		"$(basename $docker_registry_htpasswd)" \
-		--dry-run=client -o yaml \
-		--from-file=htpasswd=<(htpasswd -Bin "$docker_registry_user" < "$docker_registry_password") \
-		> "$docker_registry_htpasswd"
-	kubectl apply -f "$docker_registry_htpasswd"
-
-	kubectl create secret docker-registry \
-		"$(basename $docker_registry_credentials)" \
-		--docker-server=registry.k3s.hughobrien.ie \
-		--docker-username="$docker_registry_user" \
-		--docker-password="$(cat "$docker_registry_password")" \
-		--dry-run=client -o yaml > "$docker_registry_credentials"
-	kubectl apply -f "$docker_registry_credentials"
+# ingress ca
+ingress_cert="secrets/ingress-cert.yaml"
+subj="/CN=hughobrien.ie"
+ca_pw="secrets/ca.key.pw"
+ca_key="secrets/ca.key"
+ca_crt="secrets/ca.crt"
+client_key="secrets/client.key"
+client_crt="secrets/client.crt"
+client_req="secrets/client.req"
+client_p12="secrets/client.p12"
+if [ -f "$ingress_cert" ]; then
+	$kubectl apply -f - < "$ingress_cert"
+else
+	# ca key password
+	mkdir -p "$(dirname "$ca_pw")"
+	openssl rand -out "$ca_pw" -hex 32
+	# ca key
+	openssl req -new -newkey rsa:4096 \
+		-days 36500 -x509 -subj "$subj" \
+		-keyout "$ca_key" -out "$ca_crt" -passout file:"$ca_pw"
+	#  client key
+	openssl genrsa -out "$client_key" 4096
+	# client signing request
+	openssl req -new \
+		-key "$client_key" -out "$client_req" -subj "$subj"
+	# sign client request with ca key
+	openssl x509 -req \
+		-CA "$ca_crt" -CAkey "$ca_key" -passin file:"$ca_pw" \
+		-set_serial 101 -days 3650 \
+		-in "$client_req" -out "$client_crt"
+	# export as p12 for browsers
+	openssl pkcs12 -export -passout pass:"" \
+		-inkey "$client_key" -in "$client_crt" -out "$client_p12"
+	# add to cluster for nginx mtls reference
+	kubectl create secret generic -n ingress-nginx ingress-ca-cert \
+		--dry-run=client --from-file=ca.crt="$ca_crt" -o yaml > "$ingress_cert"
+	$kubectl apply -f - < "$ingress_cert"
+	rm "$client_req"
 fi
-kubectl apply -f manifests/docker-registry.yaml
 
-# prometheus
-jq -n --arg ns prometheus "$jq_ns_template" | kubectl apply -f -
-prometheus_cert="secrets/prometheus-cert.yaml"
-[ -f "$prometheus_cert" ] && kubectl apply -f "$prometheus_cert"
-kubectl apply -f manifests/prometheus.yaml
+# cert-manager
+$kubectl apply -f "$certmanager_manifest_url"
+# ensure certmanager is ready
+while [ "$($kubectl get pods -n cert-manager -l app=webhook -o json | jq '.items[0].status.containerStatuses[0].ready')" != true ]; do
+	sleep 5
+done
+$kubectl apply -f - < manifests/cert-manager-acme-issuer.yaml
 
-# argo workflows
-jq -n --arg ns argo "$jq_ns_template" | kubectl apply -f -
-kubectl apply -n argo -f "$argo_workflows_manifest_url"
-argo_cert="secrets/argo-cert.yaml"
-[ -f "$argo_cert" ] && kubectl apply -f "$argo_cert"
-kubectl apply -f manifests/argo-ingress.yaml
+# LE signed API cert
+api_cert="secrets/k3s-cert.yaml"
+[ -f "$api_cert" ] && $kubectl apply -f - < "$api_cert"
 
-# argo cd
-jq -n --arg ns argocd "$jq_ns_template" | kubectl apply -f -
-kubectl apply -n argocd -f "$argo_cd_manifest_url"
-# use argo in open mode
-kubectl patch deploy -n argocd argocd-server --type json \
-	-p '[{"op": "add", "path": "/spec/template/spec/containers/0/command/-", "value": "--disable-auth"}]'
-argocd_cert="secrets/argocd-cert.yaml"
-[ -f "$argocd_cert" ] && kubectl apply -f "$argocd_cert"
-kubectl apply -f manifests/argocd-ingress.yaml
+# k8s api ingress
+$kubectl apply -f - < manifests/kubernetes-api-ingress.yaml
+
+kubectl config set-credentials k3s \
+	--username=admin \
+	--password="$($kubectl config view -o jsonpath='{.users[0].user.password}' | xargs)" \
+	--client-key="$client_key" \
+	--client-certificate="$client_crt" \
+	--embed-certs
+kubectl get nodes -o wide || echo perhaps LE cert is not ready yet
