@@ -89,7 +89,7 @@ $kubectl apply -f - < manifests/kubernetes-api-ingress.yaml
 
 kubectl config set-credentials k3s \
 	--username=admin \
-	--password="$($kubectl config view -o jsonpath='{.users[0].user.password}')" \
+	--password="$($kubectl config view -o jsonpath='{.users[0].user.password}' | xargs)" \
 	--client-key="$client_key" \
 	--client-certificate="$client_crt" \
 	--embed-certs
