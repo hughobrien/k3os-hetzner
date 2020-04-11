@@ -81,7 +81,7 @@ fi
 # cert-manager
 $kubectl apply -f "$certmanager_manifest_url"
 # ensure certmanager is ready
-while [ "$($kubectl get pods -n cert-manager -l app=webhook -o jsonpath='{.items[].status.containerStatuses[].ready}')" != true ]; do
+while [ "$($kubectl get pods -n cert-manager -l app=webhook -o jsonpath=\''{.items[].status.containerStatuses[].ready}'\')" != true ]; do
 	echo awaiting cert-manager deployment
 	sleep 5
 done
@@ -96,15 +96,15 @@ $kubectl apply -f - < manifests/kubernetes-api-ingress.yaml
 
 kubectl config set-credentials k3s \
 	--username=admin \
-	--password="$($kubectl config view -o jsonpath='{.users[0].user.password}' | xargs)" \
+	--password="$($kubectl config view -o jsonpath=\''{.users[0].user.password}'\' | xargs)" \
 	--client-key="$client_key" \
 	--client-certificate="$client_crt" \
 	--embed-certs
 
 # wait for api cert
-while [ ! "$($kubectl get secret k3s-cert -o jsonpath='{.data.tls\.crt}')" ]; do
+while [ ! "$($kubectl get secret k3s-cert -o jsonpath=\''{.data.tls\.crt}'\')" ]; do
 	$kubectl get pods
-	$kubectl get orders -o jsonpath='{.items[].status.state}'
+	$kubectl get orders -o jsonpath=\''{.items[].status.state}'\'
 	echo awaiting LE cert provisioning
 	sleep 30
 done
