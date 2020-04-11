@@ -21,6 +21,9 @@ hosting_file="secrets/hosting"
 
 set -x
 
+newca=${newca:-""}
+[ "$newca" ] && rm secrets/{ingress-cert.yaml,client.crt,client.key,client.p12,ca.crt,ca.key}
+
 export HCLOUD_TOKEN
 export hosting
 
