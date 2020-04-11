@@ -12,7 +12,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-tls-secret: "ingress-nginx/mtls-cert"
 spec:
   rules:
-    - host: k8s.k3s.hughobrien.ie
+    - host: k3s.hughobrien.ie
       http:
         paths:
           - path: /
@@ -21,5 +21,5 @@ spec:
               servicePort: https
   tls:
     - hosts:
-        - k8s.k3s.hughobrien.ie
+        - k3s.hughobrien.ie
       secretName: k3s-cert

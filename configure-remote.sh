@@ -20,7 +20,7 @@ ssh_opts="-o StrictHostKeyChecking=no"
 kubectl="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl"
 
 # preconfig for dry-run yaml generation
-kubectl config set-cluster k3s --server=https://k8s.k3s.hughobrien.ie
+kubectl config set-cluster k3s --server=https://k3s.hughobrien.ie
 kubectl config set-credentials k3s --username=admin
 kubectl config set-context k3s --cluster=k3s --user=k3s
 kubectl config use-context k3s
