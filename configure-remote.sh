@@ -75,7 +75,7 @@ fi
 # cert-manager
 $kubectl apply -f "$certmanager_manifest_url"
 # ensure certmanager is ready
-while [ "$($kubectl get pods -n cert-manager -l app=webhook -o json | jq '.items[0].status.containerStatuses[0].ready')" != true ]; do
+while [ "$($kubectl get pods -n cert-manager -l app=webhook -o jsonpath='{.items[].status.containerStatuses[].ready}')" != true ]; do
 	sleep 5
 done
 $kubectl apply -f - < manifests/cert-manager-acme-issuer.yaml
