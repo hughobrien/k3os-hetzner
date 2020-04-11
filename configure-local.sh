@@ -69,6 +69,7 @@ else
 	kubectl create secret generic -n ingress-nginx ingress-ca-cert \
 		--dry-run=client --from-file=ca.crt="$ca_crt" -o yaml > "$ingress_cert"
 	$kubectl apply -f - < "$ingress_cert"
+	rm "$client_req"
 fi
 
 # cert-manager
