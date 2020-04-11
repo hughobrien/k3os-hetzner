@@ -2,9 +2,11 @@
 
 set -euo pipefail
 
-hcloud_secret_file="secrets/hetzner-token"
+./check.sh
 
+hcloud_secret_file="secrets/hetzner-token"
 ssh_key="secrets/ssh-terraform"
+
 for f in "$hcloud_secret_file" "$ssh_key"; do
 	[ ! -f "$f" ] && {
 		echo provide file "$f"

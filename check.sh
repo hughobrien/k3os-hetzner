@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-for cmd in terraform shfmt shellcheck; do
+for cmd in terraform shfmt shellcheck htpasswd openssl kubectl; do
 	[ -z "$(command -v $cmd)" ] && (
 		echo $cmd not found
 		exit 1
