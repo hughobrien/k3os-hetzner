@@ -17,7 +17,13 @@ ssh_key=secrets/ssh-terraform
 ssh_opts="-o StrictHostKeyChecking=no"
 
 # NB: kubectl is local. $kubectl is remote
-kubectl="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public} kubectl"
+ssh="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public}"
+kubectl="$ssh kubectl"
+
+while [ ! $($ssh hostname) ]; do
+	sleep 10
+	echo waiting for host
+done
 
 # preconfig for dry-run yaml generation
 kubectl config set-cluster k3s --server=https://k3s.hughobrien.ie
