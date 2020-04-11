@@ -40,7 +40,7 @@ $kubectl patch service -n ingress-nginx ingress-nginx \
 
 # ingress ca
 ingress_cert="secrets/ingress-cert.yaml"
-subj="/CN=hughobrien.ie"
+subj="/C=IE/ST=Dublin/O=hughobrien.ie/CN=hughobrien.ie"
 ca_pw="secrets/ca.key.pw"
 ca_key="secrets/ca.key"
 ca_crt="secrets/ca.crt"
