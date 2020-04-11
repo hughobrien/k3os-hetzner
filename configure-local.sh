@@ -93,4 +93,4 @@ kubectl config set-credentials k3s \
 	--client-key="$client_key" \
 	--client-certificate="$client_crt" \
 	--embed-certs
-kubectl get nodes -o wide || echo perhaps LE cert is not ready yet?
+kubectl get nodes -o wide || echo perhaps LE cert is not ready yet
