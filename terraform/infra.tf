@@ -109,13 +109,17 @@ provider "random" {
   version = "~> 2.2"
 }
 
-output "conn_str" {
+output "connection_strings" {
   value = {
     for host in local.hosts_named :
     "${host.idx} ${host.name}" => "ssh -i secrets/ssh-terraform -o StrictHostKeyChecking=no rancher@${hcloud_server.hosts[host.name].ipv4_address}"
   }
 }
 
-output "now_run" {
-  value = "create DNS records - export k3s_ip=${[for host in local.hosts_named : hcloud_server.hosts[host.name].ipv4_address if host.idx == 0][0]}; ./configure-remote.sh $k3s_ip && ./configure-local.sh $k3s_ip"
+output "dns" {
+  value = "create DNS master.${var.fqdn}=${[for host in local.hosts_named : hcloud_server.hosts[host.name].ipv4_address if host.idx == 0][0]} ${var.fqdn}=${join(",", [for host in local.hosts_named : hcloud_server.hosts[host.name].ipv4_address if host.idx != 0])}"
+}
+
+output "next_steps" {
+  value = "export newca=0 newreg=0; ./configure-remote.sh && ./configure-local.sh"
 }
