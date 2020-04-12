@@ -3,26 +3,26 @@
 code works, readme is work-in-progress
 
 Features:
-	- Terraform to provision nodes
-	- Hetzner rescue mode abused to install k3s
-	- Lets encrypt / certmanager for on-demand TLS certs
-	- Built in docker registry
-	- Client TLS certificates (mutual-TLS) used to expose sensitive apps
-	- K8s API / kubectl access also guarded by nginx client certs
-	- Auto-generate kubeconfig for local interaction
-	- Auto-generate docker credentials
-	- Prometheus with full service auto discovery
-	- Longhorn for replicated persisted volumes
-	- Cute server names auto-generated
-	- Single master setup with option for highly-available master
-	- Optional floating IPs
-	- Optional external volumes
-	- Secret/Cert backup
-	- Code pre-checks
-	- Provide your own k3s ISO / script
-	- As many worker nodes as you like
-	- Argo workflows
-	- Argo CD
+- Terraform to provision nodes
+- Hetzner rescue mode abused to install k3s
+- Lets encrypt / certmanager for on-demand TLS certs
+- Built in docker registry
+- Client TLS certificates (mutual-TLS) used to expose sensitive apps
+- K8s API / kubectl access also guarded by nginx client certs
+- Auto-generate kubeconfig for local interaction
+- Auto-generate docker credentials
+- Prometheus with full service auto discovery
+- Longhorn for replicated persisted volumes
+- Cute server names auto-generated
+- Single master setup with option for highly-available master
+- Optional floating IPs
+- Optional external volumes
+- Secret/Cert backup
+- Code pre-checks
+- Provide your own k3s ISO / script
+- As many worker nodes as you like
+- Argo workflows
+- Argo CD
 
 - [k3OS](https://github.com/rancher/k3os)
 - [multi-master](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/)
