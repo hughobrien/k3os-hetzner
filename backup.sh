@@ -21,11 +21,10 @@ mkdir -p secrets
 
 get_secret argo argo-cert
 get_secret argocd argocd-cert
-get_secret argocd argocd-cert
 get_secret default k3s-cert
 get_secret default registry-credentials
-get_secret docker-registry registry-htpasswd
 get_secret docker-registry registry-cert
+get_secret docker-registry registry-htpasswd
 get_secret ingress-nginx ingress-cert
 get_secret longhorn-system longhorn-cert
 get_secret prometheus prometheus-cert
