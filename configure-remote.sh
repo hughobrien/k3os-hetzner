@@ -79,8 +79,7 @@ done
 $kubectl apply -f - < manifests/cert-manager-acme-issuer.yaml
 
 # LE signed API cert
-api_cert="secrets/k3s-cert.yaml"
-[ -f "$api_cert" ] && $kubectl apply -f - < "$api_cert"
+[ -f secrets/k3s-cert.yaml ] && $kubectl apply -f - < secrets/k3s-cert.yaml
 
 # k8s api ingress
 $kubectl apply -f - < manifests/kubernetes-api-ingress.yaml
