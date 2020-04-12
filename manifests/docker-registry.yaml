@@ -11,7 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "off"
     nginx.ingress.kubernetes.io/auth-tls-secret: "ingress-nginx/ingress-cert"
 spec:
   rules:
@@ -100,7 +100,7 @@ spec:
             secretName: registry-cert
         - name: htpasswd
           secret:
-            secretName: htpasswd
+            secretName: registry-htpasswd
 
 ---
 apiVersion: v1
