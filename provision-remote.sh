@@ -45,10 +45,7 @@ write_files:
   content: |
     alias k='kubectl'
     alias pods='kubectl get pods --all-namespaces --watch'
-    alias orders='kubectl get orders --all-namespaces --watch'
-    alias csrs='kubectl get certificaterequests --all-namespaces --watch'
     alias ingress='kubectl get ingress --all-namespaces --watch'
-    alias services='kubectl get services --all-namespaces --watch'
     alias hosts='kubectl get ingress --all-namespaces  -o jsonpath="{.items[*].spec.rules[*].host}" | xargs -n 1 | sed "s|^|https://|" | sort'
   owner: rancher
   permissions: '0644'
