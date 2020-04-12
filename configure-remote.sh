@@ -20,6 +20,13 @@ ssh_opts="-o StrictHostKeyChecking=no"
 ssh="ssh $ssh_opts -i $ssh_key ${k3os_user}@${node_ipv4_public}"
 kubectl="$ssh kubectl"
 
+namespace() {
+	jq -n --arg ns "$1" '{"apiVersion": "v1", "kind": "Namespace", "metadata": {"name": $ns}}'
+}
+
+newca=${newca:-""}
+[ "$newca" ] && rm -f secrets/{ingress-cert.yaml,client.crt,client.csr,client.key,client.p12,ca.crt,ca.key}
+
 while [ ! "$($ssh hostname)" ]; do
 	sleep 10
 	echo waiting for host
@@ -32,53 +39,35 @@ kubectl config set-context k3s --cluster=k3s --user=k3s
 kubectl config use-context k3s
 
 # ingress-nginx
+namespace ingress-nginx | $kubectl apply -f -
+
+mkdir -p secrets
+
+if [ ! -f secrets/ingress-cert.yaml ]; then
+	# https://github.com/kubernetes/ingress-nginx/blob/master/docs/examples/auth/client-certs/README.md#creating-certificate-secrets
+	pushd secrets
+	openssl req -x509 -sha256 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 3650 -nodes -subj '/CN=My Cert Authority'
+	openssl req -new -newkey rsa:4096 -keyout client.key -out client.csr -nodes -subj '/CN=My Client'
+	openssl x509 -req -sha256 -days 3650 -in client.csr -CA ca.crt -CAkey ca.key -set_serial 02 -out client.crt
+	kubectl create secret generic -n ingress-nginx ingress-cert --from-file=ca.crt=ca.crt -o yaml --dry-run=client > ingress-cert.yaml
+
+	# export as p12 for browsers
+	openssl pkcs12 -export -passout pass:"" -inkey client.key -in client.crt -out client.p12
+	popd
+fi
+$kubectl apply -f - < secrets/ingress-cert.yaml
+
 $kubectl apply -f "$ingress_nginx_manifest_url1"
 $kubectl apply -f "$ingress_nginx_manifest_url2"
 # make ingress an LB so that svclb picks it up
 $kubectl patch service -n ingress-nginx ingress-nginx \
 	-p \''{"spec":{"type":"LoadBalancer"}}'\'
 
-# ingress ca
-ingress_cert="secrets/ingress-cert.yaml"
-subj="/C=IE/ST=Dublin/O=hughobrien.ie/CN=hughobrien.ie"
-ca_pw="secrets/ca.key.pw"
-ca_key="secrets/ca.key"
-ca_crt="secrets/ca.crt"
-client_key="secrets/client.key"
-client_crt="secrets/client.crt"
-client_req="secrets/client.req"
-client_p12="secrets/client.p12"
-days="3650"
-if [ -f "$ingress_cert" ]; then
-	$kubectl apply -f - < "$ingress_cert"
-else
-	# ca key password
-	mkdir -p "$(dirname "$ca_pw")"
-	openssl rand -out "$ca_pw" -hex 32
-	# ca key
-	openssl req -newkey rsa:4096 \
-		-keyform PEM -outform PEM \
-		-days "$days" -x509 -subj "$subj" \
-		-passout file:"$ca_pw" -keyout "$ca_key" -out "$ca_crt"
-	#  client key
-	openssl genrsa -out "$client_key" 4096
-	# client signing request
-	openssl req -new \
-		-key "$client_key" -out "$client_req" -subj "$subj"
-	# sign client request with ca key
-	openssl x509 -req \
-		-CA "$ca_crt" -CAkey "$ca_key" -passin file:"$ca_pw" \
-		-set_serial 101 -extensions client -days "$days" \
-		-in "$client_req" -out "$client_crt" -outform PEM
-	# export as p12 for browsers
-	openssl pkcs12 -export -passout pass:"k3s.hughobrien.ie" \
-		-inkey "$client_key" -in "$client_crt" -out "$client_p12"
-	# add to cluster for nginx mtls reference
-	kubectl create secret generic -n ingress-nginx ingress-ca-cert \
-		--dry-run=client --from-file=ca.crt="$ca_crt" -o yaml > "$ingress_cert"
-	$kubectl apply -f - < "$ingress_cert"
-	rm "$client_req"
-fi
+# ensure nginx is ready
+while [ "$($kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx -o jsonpath=\''{.items[].status.containerStatuses[].ready}'\')" != true ]; do
+	echo awaiting ingress-nginx deployment
+	sleep 5
+done
 
 # cert-manager
 $kubectl apply -f "$certmanager_manifest_url"
@@ -99,8 +88,8 @@ $kubectl apply -f - < manifests/kubernetes-api-ingress.yaml
 kubectl config set-credentials k3s \
 	--username=admin \
 	--password="$($kubectl config view -o jsonpath=\''{.users[0].user.password}'\' | xargs)" \
-	--client-key="$client_key" \
-	--client-certificate="$client_crt" \
+	--client-key=secrets/client.key \
+	--client-certificate=secrets/client.crt \
 	--embed-certs
 
 # wait for api cert
@@ -111,4 +100,5 @@ while [ ! "$($kubectl get secret k3s-cert -o jsonpath=\''{.data.tls\.crt}'\')" ]
 	sleep 30
 done
 
-kubectl get nodes -o wide || echo perhaps LE cert is not ready yet
+sleep 10
+kubectl get nodes -o wide
