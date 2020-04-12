@@ -2,6 +2,9 @@
 
 code works, readme is work-in-progress
 
+€3 for small single node
+€15 for small master node + 2x medium worker nodes (default)
+
 Features:
 - [k3OS](https://github.com/rancher/k3os)
 - Terraform to provision nodes
