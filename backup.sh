@@ -13,8 +13,8 @@ get_secret() {
 	kubectl get secret -n "$namespace" "$secret_name" -o yaml |
 		yq -Y 'del(.metadata.resourceVersion)' |
 		yq -Y 'del(.metadata.uid)' |
-		yq -Y 'del(.metadata.annotations."kubectl.kubernetes.io/last-applied-configuration")' |
-		> "secrets/${secret_name}.yaml"
+		yq -Y 'del(.metadata.annotations."kubectl.kubernetes.io/last-applied-configuration")' \
+			> "secrets/${secret_name}.yaml"
 }
 
 mkdir -p secrets
