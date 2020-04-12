@@ -2,10 +2,10 @@
 
 code works, readme is work-in-progress
 
-€3 for small single node
-€15 for small master node + 2x medium worker nodes (default)
+- €3 for small single node
+- €15 for small master node + 2x medium worker nodes (default)
 
-Features:
+# Features
 - [k3OS](https://github.com/rancher/k3os)
 - Terraform to provision nodes
 - Hetzner rescue mode abused to install k3s
@@ -28,7 +28,7 @@ Features:
 - Argo workflows
 - Argo CD
 
-References to 'k3s.hughobrien.ie' are hard coded in several places, be sure to adjust those accordingly.
+**References to 'k3s.hughobrien.ie' are hard coded in several places, be sure to adjust those accordingly.**
 
 # Cluster Setup
 1. Get: [Terraform](https://www.terraform.io/downloads.html), [ShellCheck](https://www.shellcheck.net/), [shfmt](https://github.com/mvdan/sh), [yamllint](https://pypi.org/project/yamllint/), [jq](https://stedolan.github.io/jq/), [yq](https://pypi.org/project/yq/), [openssl](https://www.openssl.org/), [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), [apache](https://httpd.apache.org/)
