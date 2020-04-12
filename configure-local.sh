@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -xeuo pipefail
 
-# shellcheck disable=SC2016
-jq_ns_template='{"apiVersion": "v1", "kind": "Namespace", "metadata": {"name": $ns}}'
+namespace() {
+	jq -n --arg ns "$1" '{"apiVersion": "v1", "kind": "Namespace", "metadata": {"name": $ns}}'
+}
 
 longhorn_ver="v0.8.0"
 longhorn_manifest_url="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
@@ -20,7 +21,7 @@ longhorn_cert="secrets/longhorn-cert.yaml"
 kubectl apply -f manifests/longhorn-ingress-storageclass.yaml
 
 # docker registry
-jq -n --arg ns docker-registry "$jq_ns_template" | kubectl apply -f -
+namespace docker-registry | kubectl apply -f -
 docker_registry_cert="secrets/registry-cert.yaml"
 [ -f "$docker_registry_cert" ] && kubectl apply -f "$docker_registry_cert"
 
@@ -50,20 +51,20 @@ fi
 kubectl apply -f manifests/docker-registry.yaml
 
 # prometheus
-jq -n --arg ns prometheus "$jq_ns_template" | kubectl apply -f -
+namespace prometheus | kubectl apply -f -
 prometheus_cert="secrets/prometheus-cert.yaml"
 [ -f "$prometheus_cert" ] && kubectl apply -f "$prometheus_cert"
 kubectl apply -f manifests/prometheus.yaml
 
 # argo workflows
-jq -n --arg ns argo "$jq_ns_template" | kubectl apply -f -
+namespace argo | kubectl apply -f -
 kubectl apply -n argo -f "$argo_workflows_manifest_url"
 argo_cert="secrets/argo-cert.yaml"
 [ -f "$argo_cert" ] && kubectl apply -f "$argo_cert"
 kubectl apply -f manifests/argo-ingress.yaml
 
 # argo cd
-jq -n --arg ns argocd "$jq_ns_template" | kubectl apply -f -
+namespace argocd | kubectl apply -f -
 kubectl apply -n argocd -f "$argo_cd_manifest_url"
 # use argo in open mode
 kubectl patch deploy -n argocd argocd-server --type json \
