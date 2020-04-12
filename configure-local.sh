@@ -78,5 +78,8 @@ argocd_cert="secrets/argocd-cert.yaml"
 [ -f "$argocd_cert" ] && kubectl apply -f "$argocd_cert"
 kubectl apply -f manifests/argocd-ingress.yaml
 
+# add extra nginx
+kubectl scale deployment -n ingress-nginx nginx-ingress-controller --replicas=2
+
 kubectl get nodes -o wide
 echo docker login -u k3s -p "$(cat secrets/registry.pw)" "registry.${fqdn}"
