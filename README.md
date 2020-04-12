@@ -45,6 +45,7 @@ code works, readme is work-in-progress
 1. `./build.sh`
 1. Screw up? `destroy=1 ./build.sh`
 1. Instructions for next steps are shown after build, CREATE THE DNS ENTRIES!
-1. Install the `client.p12` browser certificate before attempting to access the services.
 1. ./configure-remote.sh -  sets up local `kubectl` with protections
 1. ./configure-local.sh  -  sets up remaining services
+1. Install the `client.p12` browser certificate before attempting to access the services.
+	1. Password is the FQDN
