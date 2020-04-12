@@ -38,6 +38,7 @@ References to 'k3s.hughobrien.ie' are hard coded in several places, be sure to a
 	1. If you do not specify this, it will pull from GitHub which may be slow, or broken, or compromised.
 	1. The provided link must be publicly accessible.
 1. Modify `terraform.tfvars`
+	1. Set node count, location
 1. `./build.sh`
 1. Screw up? `destroy=1 ./build.sh`
 1. Instructions for next steps are shown after build, CREATE THE DNS ENTRIES!
