@@ -3,6 +3,7 @@
 code works, readme is work-in-progress
 
 Features:
+- [k3OS](https://github.com/rancher/k3os)
 - Terraform to provision nodes
 - Hetzner rescue mode abused to install k3s
 - Lets encrypt / certmanager for on-demand TLS certs
@@ -24,21 +25,10 @@ Features:
 - Argo workflows
 - Argo CD
 
-- [k3OS](https://github.com/rancher/k3os)
-- [multi-master](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/)
-
 References to 'k3s.hughobrien.ie' are hard coded in several places, be sure to adjust those accordingly.
 
 # Cluster Setup
-1. Get [Terraform](https://www.terraform.io/downloads.html)
-1. Get [ShellCheck](https://www.shellcheck.net/)
-1. Get [shfmt](https://github.com/mvdan/sh)
-1. Get [yamllint](https://pypi.org/project/yamllint/)
-1. Get [jq](https://stedolan.github.io/jq/)
-1. Get [yq](https://pypi.org/project/yq/)
-1. Get [openssl](https://www.openssl.org/)
-1. Get [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-1. Get [apache](https://httpd.apache.org/) (to create docker registry htpasswd file)
+1. Get: [Terraform](https://www.terraform.io/downloads.html), [ShellCheck](https://www.shellcheck.net/), [shfmt](https://github.com/mvdan/sh), [yamllint](https://pypi.org/project/yamllint/), [jq](https://stedolan.github.io/jq/), [yq](https://pypi.org/project/yq/), [openssl](https://www.openssl.org/), [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), [apache](https://httpd.apache.org/)
 1. Open a [Hetzner account](https://www.hetzner.com/).
 1. Generate a Hetzner token: `https://console.hetzner.cloud/projects/<your project ID>/access/tokens`
 	1. Save it as `secrets/hetzner-token`
