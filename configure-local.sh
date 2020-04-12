@@ -18,7 +18,7 @@ argo_cd_ver="v1.5.1"
 argo_cd_manifest_url="https://raw.githubusercontent.com/argoproj/argo-cd/${argo_cd_ver}/manifests/install.yaml"
 
 newreg=${newreg:-""}
-[ "$newreg" ] && rm -f secrets/{registry.pw,registry-htpasswd.yaml,registry-credentials.yaml}
+[ "$newreg" ] && rm -f secrets/registry{.pw,-htpasswd.yaml,-credentials.yaml}
 
 # longhorn
 mknamespace longhorn-system
@@ -79,3 +79,4 @@ argocd_cert="secrets/argocd-cert.yaml"
 kubectl apply -f manifests/argocd-ingress.yaml
 
 kubectl get nodes -o wide
+echo docker login -u k3s -p "$(cat secrets/registry.pw)" "registry.${fqdn}"
