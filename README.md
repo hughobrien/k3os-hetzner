@@ -1,19 +1,44 @@
-- [k3os](https://github.com/rancher/k3os)
-- Supports [multi-master](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/)
-- Current cost: €9.18 per month
-```
-nbg1-liberal-worm [~]$ kubectl get nodes -o wide
-NAME                 STATUS   ROLES    AGE   VERSION        INTERNAL-IP   EXTERNAL-IP      OS-IMAGE      KERNEL-VERSION     CONTAINER-RUNTIME
-nbg1-outgoing-teal   Ready    master   88s   v1.17.2+k3s1   10.0.0.4      94.130.xxx.xxx    k3OS v0.9.1   5.0.0-37-generic   containerd://1.3.3-k3s1
-nbg1-tops-fawn       Ready    master   84s   v1.17.2+k3s1   10.0.0.3      88.198.xxx.xxx    k3OS v0.9.1   5.0.0-37-generic   containerd://1.3.3-k3s1
-nbg1-liberal-worm    Ready    master   97s   v1.17.2+k3s1   10.0.0.2      116.203.xxx.xxx   k3OS v0.9.1   5.0.0-37-generic   containerd://1.3.3-k3s1
-```
+# Kubernetes on Hetzner - k3s - €3 per month
+
+code works, readme is work-in-progress
+
+Features:
+	* Terraform to provision nodes
+	* Hetzner rescue mode abused to install k3s
+	* Lets encrypt / certmanager for on-demand TLS certs
+	* Built in docker registry
+	* Client TLS certificates (mutual-TLS) used to expose sensitive apps
+	* K8s API / kubectl access also guarded by nginx client certs
+	* Auto-generate kubeconfig for local interaction
+	* Auto-generate docker credentials
+	* Prometheus with full service auto discovery
+	* Longhorn for replicated persisted volumes
+	* Cute server names auto-generated
+	* Single master setup with option for highly-available master
+	* Optional floating IPs
+	* Optional external volumes
+	* Secret/Cert backup
+	* Code pre-checks
+	* Provide your own k3s ISO / script
+	* As many worker nodes as you like
+	* Argo workflows
+	* Argo CD
+
+- [k3OS](https://github.com/rancher/k3os)
+- [multi-master](https://rancher.com/docs/k3s/latest/en/installation/ha-embedded/)
+
+References to 'k3s.hughobrien.ie' are hard coded in several places, be sure to adjust those accordingly.
 
 # Cluster Setup
 1. Get [Terraform](https://www.terraform.io/downloads.html)
-1. Optional: Get [ShellCheck](https://www.shellcheck.net/)
-1. Optional: Get [shfmt](https://github.com/mvdan/sh)
-1. Optional: Get [yamllint](https://pypi.org/project/yamllint/)
+1. Get [ShellCheck](https://www.shellcheck.net/)
+1. Get [shfmt](https://github.com/mvdan/sh)
+1. Get [yamllint](https://pypi.org/project/yamllint/)
+1. Get [jq](https://stedolan.github.io/jq/)
+1. Get [yq](https://pypi.org/project/yq/)
+1. Get [openssl](https://www.openssl.org/)
+1. Get [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+1. Get [apache](https://httpd.apache.org/) (to create docker registry htpasswd file)
 1. Open a [Hetzner account](https://www.hetzner.com/).
 1. Generate a Hetzner token: `https://console.hetzner.cloud/projects/<your project ID>/access/tokens`
 	1. Save it as `secrets/hetzner-token`
@@ -22,12 +47,10 @@ nbg1-liberal-worm    Ready    master   97s   v1.17.2+k3s1   10.0.0.2      116.20
 1. Optional: If you want to store the K3OS ISO/install script somewhere (like B2 or S3) you can specify the URL prefix in `secrets/hosting`.
 	1. If you do not specify this, it will pull from GitHub which may be slow, or broken, or compromised.
 	1. The provided link must be publicly accessible.
-1. Optional: Modify `terraform.tfvars` to put one node in each Hetzner location. Must be an odd number of total nodes.
-1. Optional: `./check.sh`
+1. Modify `terraform.tfvars`
 1. `./build.sh`
 1. Screw up? `destroy=1 ./build.sh`
-
-# Registry Setup
-*You can avoid all of this by using one of the many commercial container registry services*
-something about b2 minio sadness
-attempt r2 longhorn registry:FS mode
+1. Instructions for next steps are shown after build, CREATE THE DNS ENTRIES!
+1. Install the `client.p12` browser certificate before attempting to access the services.
+1. ./configure-remote.sh -  sets up local `kubectl` with protections
+1. ./configure-local.sh  -  sets up remaining services
