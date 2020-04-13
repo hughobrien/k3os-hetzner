@@ -60,6 +60,7 @@ mknamespace prometheus
 prometheus_cert="secrets/prometheus-cert.yaml"
 [ -f "$prometheus_cert" ] && kubectl apply -f "$prometheus_cert"
 kubectl apply -f manifests/prometheus.yaml
+kubectl apply -f manifests/node-exporter.yaml
 
 # argo workflows
 mknamespace argo
