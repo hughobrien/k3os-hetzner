@@ -31,11 +31,6 @@ done
 terraform validate
 popd
 
-for f in *.sh; do
-	shellcheck "$f"
-	shfmt -s -sr -d "$f"
-done
-
-for f in manifests/*; do
-	yamllint -c .yamllint "$f"
-done
+shfmt -s -sr -d ./*.sh
+shellcheck ./*.sh
+yamllint -c .yamllint manifests/*.yaml
