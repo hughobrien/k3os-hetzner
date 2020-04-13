@@ -12,11 +12,14 @@ code works, readme is work-in-progress
 - Lets encrypt / certmanager for on-demand TLS certs
 - Built in docker registry
 - Client TLS certificates (mutual-TLS) used to expose sensitive apps
+	- Supported by all major browsers, desktop & mobile
 - K8s API / kubectl access also guarded by nginx client certs
 - Auto-generate kubeconfig for local interaction
 - Auto-generate docker credentials
 - Prometheus with full service auto discovery
 - Longhorn for replicated persisted volumes
+- Argo workflows
+- Argo CD
 - Cute server names auto-generated
 - Single master setup with option for highly-available master
 - Optional floating IPs
@@ -25,8 +28,6 @@ code works, readme is work-in-progress
 - Code pre-checks
 - Provide your own k3s ISO / script
 - As many worker nodes as you like
-- Argo workflows
-- Argo CD
 
 **References to 'k3s.hughobrien.ie' are hard coded in several places, be sure to adjust those accordingly.**
 
