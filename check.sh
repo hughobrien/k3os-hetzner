@@ -25,6 +25,7 @@ export HCLOUD_TOKEN
 set -x
 
 pushd terraform
+terraform init
 for f in *.tf terraform.tfvars; do
 	terraform fmt "$f"
 done
