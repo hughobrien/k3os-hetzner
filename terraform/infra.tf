@@ -102,7 +102,7 @@ resource "random_password" "cluster_secret" {
 #}
 
 provider "hcloud" {
-  version = "~> 1.15"
+  version = "~> 1.16"
 }
 
 provider "random" {
