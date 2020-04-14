@@ -30,6 +30,9 @@ code works, readme is work-in-progress
 - As many worker nodes as you like
 
 **References to 'k3s.hughobrien.ie' are hard coded in several places, be sure to adjust those accordingly.**
+```
+find . -type f -iname '*.yaml' -or -iname '*.tf' -or -iname '*.sh' | xargs -n 1 sed -i 's/hughobrien\.ie/foo\.app/g'
+```
 
 # Cluster Setup
 1. Get: [Terraform](https://www.terraform.io/downloads.html), [ShellCheck](https://www.shellcheck.net/), [shfmt](https://github.com/mvdan/sh), [yamllint](https://pypi.org/project/yamllint/), [jq](https://stedolan.github.io/jq/), [yq](https://pypi.org/project/yq/), [openssl](https://www.openssl.org/), [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), [apache](https://httpd.apache.org/)
