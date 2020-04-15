@@ -84,3 +84,6 @@ kubectl scale deployment -n ingress-nginx nginx-ingress-controller --replicas=2
 
 kubectl get nodes -o wide
 echo docker login -u k3s -p "$(cat secrets/registry.pw)" "registry.${fqdn}"
+
+custom_config="./configure-custom.sh"
+[ -x "$custom_config" ] && ./"$custom_config"
