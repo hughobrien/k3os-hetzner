@@ -58,7 +58,7 @@ if [ "$node_idx" -eq 0 ]; then
 k3os:
   k3s_args:
   - server
-  - --no-deploy=traefik
+  - --disable=traefik
   - --flannel-backend=$flannel_mode
   - --bind-address=$node_ipv4_private
   - --advertise-address=$node_ipv4_private
