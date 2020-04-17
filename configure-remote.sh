@@ -44,10 +44,10 @@ while [ ! "$($kubectl get service kubernetes -o jsonpath='{.spec.clusterIP}')" ]
 done
 
 # preconfig for dry-run yaml generation
-kubectl config set-cluster k3s --server="https://${fqdn}"
-kubectl config set-credentials k3s --username=admin
-kubectl config set-context k3s --cluster=k3s --user=k3s
-kubectl config use-context k3s
+kubectl config set-cluster "$fqdn" --server="https://${fqdn}"
+kubectl config set-credentials "$fqdn" --username=admin
+kubectl config set-context "$fqdn" --cluster=k3s --user=k3s
+kubectl config use-context "$fqdn"
 
 # ingress-nginx
 if [ ! -f secrets/ingress-cert.yaml ]; then
@@ -95,7 +95,7 @@ $kubectl apply -f - < manifests/cert-manager-acme-issuer.yaml
 # k8s api ingress
 $kubectl apply -f - < manifests/kubernetes-api-ingress.yaml
 
-kubectl config set-credentials k3s \
+kubectl config set-credentials "$fqdn" \
 	--username=admin \
 	--password="$($kubectl config view -o jsonpath=\''{.users[0].user.password}'\' | xargs)" \
 	--client-key=secrets/client.key \
