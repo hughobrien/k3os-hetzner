@@ -46,7 +46,7 @@ done
 # preconfig for dry-run yaml generation
 kubectl config set-cluster "$fqdn" --server="https://${fqdn}"
 kubectl config set-credentials "$fqdn" --username=admin
-kubectl config set-context "$fqdn" --cluster=k3s --user=k3s
+kubectl config set-context "$fqdn" --cluster="$fqdn" --user="$fqdn"
 kubectl config use-context "$fqdn"
 
 # ingress-nginx
