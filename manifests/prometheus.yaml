@@ -254,7 +254,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: prometheus
-          image: prom/prometheus:v2.17.1
+          image: prom/prometheus:v2.17.2
           resources:
             requests:
               memory: 256Mi
