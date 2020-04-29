@@ -6,7 +6,7 @@ set -xeuo pipefail
 
 fqdn="k3s.hughobrien.ie"
 
-certmanager_ver="v0.14.2"
+certmanager_ver="v0.14.3"
 certmanager_manifest_url="https://github.com/jetstack/cert-manager/releases/download/${certmanager_ver}/cert-manager.yaml"
 
 ingress_nginx_ver="nginx-0.30.0"
