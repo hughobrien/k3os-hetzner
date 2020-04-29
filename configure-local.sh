@@ -8,7 +8,7 @@ mknamespace() {
 
 fqdn="k3s.hughobrien.ie"
 
-longhorn_ver="v0.8.0"
+longhorn_ver="v0.8.1"
 longhorn_manifest_url="https://raw.githubusercontent.com/longhorn/longhorn/${longhorn_ver}/deploy/longhorn.yaml"
 
 argo_workflows_ver="v2.7.6"
